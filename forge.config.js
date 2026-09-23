@@ -17,6 +17,7 @@ module.exports = {
       "^/out",
       "^/docs",
       "^/todolist.json",
+      "^/CLAUDE.md",
       "^/donate.md",
       "^/\\.github",
       "^/yarn-error.log"

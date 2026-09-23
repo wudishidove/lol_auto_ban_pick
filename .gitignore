@@ -135,3 +135,8 @@ app-config.json
 
 resources/test/
 donate.md
+
+# Claude Code 本地筆記
+CLAUDE.md
+docs/
+todolist.json
