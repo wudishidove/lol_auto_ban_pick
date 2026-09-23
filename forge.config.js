@@ -18,6 +18,7 @@ module.exports = {
       "^/docs",
       "^/todolist.json",
       "^/donate.md",
+      "^/\\.github",
       "^/yarn-error.log"
     ],
     compression: "maximum",
