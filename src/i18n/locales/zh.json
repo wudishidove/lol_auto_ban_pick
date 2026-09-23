@@ -1,13 +1,11 @@
 {
   "menu": {
     "main": "主頁",
-    "duo": "雙排",
-    "rank": "積分",
+    "matchAnalysis": "對戰分析",
     "recentPlayers": "最近遇過",
     "banPick": "選ban角",
     "runes": "符文",
     "aram": "隨機單中",
-    "selectedRole": "列隊規則",
     "about": "關於"
   },
   "main": {
@@ -46,7 +44,8 @@
       "gold": "金牌",
       "silver": "銀牌",
       "bronze": "銅牌",
-      "iron": "鐵牌"
+      "iron": "鐵牌",
+      "emerald": "翡翠"
     },
     "appStates": {
       "lolNotOpen": "LOL未開啟",
@@ -236,6 +235,16 @@
     "downloading": "下載中",
     "restarting": "下載完成，正在重新啟動以安裝更新...",
     "failed": "更新失敗，請稍後再試，或到發佈頁面手動下載"
+  },
+  "matchAnalysis": {
+    "noData": "進入選角或遊戲後，會在這裡顯示雙方的組隊、位置與積分",
+    "player": "玩家",
+    "premade": "組隊",
+    "position": "位置",
+    "selectedRole": "列隊規則",
+    "fill": "補位",
+    "unranked": "未定位",
+    "winLoss": "{{wins}}勝 {{losses}}敗"
   },
   "common": {
     "teamOne": "藍方",

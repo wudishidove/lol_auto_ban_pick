@@ -26,7 +26,7 @@ English | [中文](./README.md)
 - 🎯 **Auto hover + fallback**: hovers the champion you want, and switches to the next one if it gets banned or picked
 - 🔒 **Auto lock in**: still not back with 1 second left? It locks in for you, so you don't get dodged while washing your hands
 - 📜 **Rune profiles**: applies runes automatically by lane + champion + matchup, so you're ready the moment you sit down
-- 🏆 **Scouting report**: teammate ranks, duo detection and selected roles, right in champ select
+- 🏆 **Scouting report**: one Match page shows premades, positions and Solo/Duo + Flex ranks for both teams, right in champ select
 - 🎲 **ARAM auto grab**: pre-select the champions you want and grab them as soon as a teammate rolls one
 - 🔄 **One-click update**: get notified about new versions and update with a single click
 
@@ -47,12 +47,8 @@ English | [中文](./README.md)
   <img src="resources/github/screenshot/en/banpick_pick.jpg" width="48%" />
 </p>
 <p float="left">
-  <img src="resources/github/screenshot/en/rank.jpg" width="48%" />
-  <img src="resources/github/screenshot/en/duo.jpg" width="48%" />
-</p>
-<p float="left">
+  <img src="resources/github/screenshot/en/match_analysis.jpg" width="48%" />
   <img src="resources/github/screenshot/en/ARAM.jpg" width="48%" />
-  <img src="resources/github/screenshot/en/role.jpg" width="48%" />
 </p>
 <p float="left">
   <img src="resources/github/screenshot/en/teammate_rank.jpg" width="48%" />

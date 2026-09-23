@@ -1,13 +1,11 @@
 import {useLocation} from 'react-router-dom';
 import {useState, useEffect} from 'react';
 import Main from './Main';
-import Duo from './Duo';
-import Rank from './Rank';
+import MatchAnalysis from './MatchAnalysis';
 import RecentPlayers from './RecentPlayers';
 import BanPick from "./BanPick";
 import Runes from "./Runes";
 import ARAM from "./ARAM";
-import SelectedRole from "./SelectedRole";
 import About from "./About";
 
 function VisibleSwitch() {
@@ -22,13 +20,11 @@ function VisibleSwitch() {
 
   const routes = [
     {path: '/main', component: Main},
-    {path: '/duo', component: Duo},
-    {path: '/rank', component: Rank},
+    {path: '/matchAnalysis', component: MatchAnalysis},
     {path: '/recentPlayers', component: RecentPlayers},
     {path: '/banPick', component: BanPick},
     {path: '/runes', component: Runes},
     {path: '/aram', component: ARAM},
-    {path: '/selectedRole', component: SelectedRole},
     {path: '/about', component: About},
   ];
 

@@ -26,13 +26,11 @@ const MyLayout = ({children}) => {
 
   const items = [
     getItem(t('menu.main'), '/main'),
-    getItem(t('menu.duo'), '/duo'),
-    getItem(t('menu.rank'), '/rank'),
+    getItem(t('menu.matchAnalysis'), '/matchAnalysis'),
     getItem(t('menu.recentPlayers'), '/recentPlayers'),
     getItem(t('menu.banPick'), '/banPick'),
     getItem(t('menu.runes'), '/runes'),
     getItem(t('menu.aram'), '/aram'),
-    getItem(t('menu.selectedRole'), '/selectedRole'),
     getItem(isNewVersionAvailable ? "✨ " + t('menu.about') : t('menu.about'), '/about'),
   ];
 
@@ -40,8 +38,9 @@ const MyLayout = ({children}) => {
     token: {colorBgContainer},
   } = theme.useToken();
   return (
-    <Layout>
-      <Sider width={120} style={{background: colorBgContainer}}>
+    // 整個視窗固定高度，只讓右側內容區捲動，左側選單不會跟著滾輪一起動
+    <Layout style={{height: '100vh', overflow: 'hidden'}}>
+      <Sider width={120} style={{background: colorBgContainer, overflowY: 'auto'}}>
         <Menu
           mode="inline"
           defaultSelectedKeys={['/main']}
@@ -57,12 +56,13 @@ const MyLayout = ({children}) => {
           }}
         />
       </Sider>
-      <Layout style={{padding: '0 24px 24px'}}>
+      <Layout style={{padding: '0 24px 24px', overflowY: 'auto'}}>
         <Content
           style={{
             padding: 10,
             margin: 10,
             minHeight: "89vh",
+            flexShrink: 0, // 在可捲動的容器中不要被壓縮，否則內容較長時背景只到一半
             background: colorBgContainer,
           }}
         >

@@ -1,13 +1,11 @@
 {
   "menu": {
     "main": "Home",
-    "duo": "Duo",
-    "rank": "Rank",
+    "matchAnalysis": "Match",
     "recentPlayers": "Recent",
     "banPick": "Ban/Pick",
     "runes": "Runes",
     "aram": "ARAM",
-    "selectedRole": "Role",
     "about": "About"
   },
   "main": {
@@ -46,7 +44,8 @@
       "gold": "Gold",
       "silver": "Silver",
       "bronze": "Bronze",
-      "iron": "Iron"
+      "iron": "Iron",
+      "emerald": "Emerald"
     },
     "appStates": {
       "lolNotOpen": "LoL not open",
@@ -236,6 +235,16 @@
     "downloading": "Downloading",
     "restarting": "Download complete, restarting to install the update...",
     "failed": "Update failed. Please try again later, or download it manually from the release page"
+  },
+  "matchAnalysis": {
+    "noData": "Premades, positions and ranks of both teams show up here once champ select or the game starts",
+    "player": "Player",
+    "premade": "Premade",
+    "position": "Position",
+    "selectedRole": "Queued Role",
+    "fill": "Fill",
+    "unranked": "Unranked",
+    "winLoss": "{{wins}}W {{losses}}L"
   },
   "common": {
     "teamOne": "Blue Team",
