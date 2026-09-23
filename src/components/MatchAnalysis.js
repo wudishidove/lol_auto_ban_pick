@@ -99,7 +99,7 @@ const TeamTable = ({title, team, rankedStats}) => {
       title: t('matchAnalysis.selectedRole'),
       key: 'selectedRole',
       width: 90,
-      render: (_, player) => formatPosition(player.selectedRole, t),
+      render: (_, player) => formatQueuedRoles(player.selectedRole, t),
     },
     {
       title: t('main.rankedType.soloDuo'),
@@ -170,6 +170,14 @@ function formatPosition(position, t) {
   if (!position || position === 'NONE') return '';
   if (position === 'FILL') return t('matchAnalysis.fill');
   return t(`banPick.lanes.${position.toLowerCase()}`, {defaultValue: position});
+}
+
+// selectedRole 例: TOP.PRIMARY.TOP.MIDDLE.FILL = 分配路線.第幾志願.第一志願.第二志願[.補位標記]，只顯示兩個志願
+function formatQueuedRoles(selectedRole, t) {
+  if (!selectedRole) return '';
+  const parts = selectedRole.split('.');
+  if (parts.length < 4) return formatPosition(selectedRole, t);
+  return parts.slice(2, 4).map(role => formatPosition(role, t)).filter(Boolean).join(', ');
 }
 
 const mapStateToProps = (state) => {
