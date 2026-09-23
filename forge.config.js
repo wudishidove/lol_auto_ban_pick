@@ -14,6 +14,7 @@ module.exports = {
       "^/.env",
       "^/src",
       "^/app-config.json",
+      "^/data",
       "^/out",
       "^/docs",
       "^/todolist.json",

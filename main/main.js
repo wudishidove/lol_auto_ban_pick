@@ -1,10 +1,23 @@
-const {app, BrowserWindow, ipcMain, Menu, Tray, shell, nativeTheme} = require('electron')
+const {app, BrowserWindow, ipcMain, Menu, Tray, shell, nativeTheme, protocol, net: electronNet} = require('electron')
 const path = require('path');
+const fs = require('fs');
 const RiotWSProtocol = require('./lcu-ws.js');
 require('./hide-child-console'); // 要在 league-connect 之前載入
 const LeagueClient = require('league-connect');
 const isDev = require('electron-is-dev');
 const logger = require('./logger');
+
+// 免安裝版：快取、IndexedDB 等一律放在程式資料夾的 data 裡，不寫到 %APPDATA%
+// 要在任何 app.getPath('userData') 之前設定(electron-store 會呼叫)，否則預設資料夾還是會被建出來
+// 也要在 requestSingleInstanceLock 之前，鎖檔放在 userData 裡
+const userDataDir = isDev ? path.join(__dirname, '../data') : path.join(path.dirname(process.execPath), 'data');
+try {
+  fs.mkdirSync(userDataDir, {recursive: true});
+  app.setPath('userData', userDataDir);
+} catch (error) {
+  logger.error(`use portable userData failed: ${error.message}`);
+}
+
 const {initUpdater} = require('./updater');
 const Store = require('electron-store');
 const config = {name: 'app-config', fileExtension: 'json', cwd: path.dirname(__dirname)}
@@ -17,6 +30,12 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 app.commandLine.appendSwitch('ignore-certificate-errors')
 app.commandLine.appendSwitch('allow-insecure-localhost', 'true');
 app.commandLine.appendSwitch('disable-features', 'WidgetLayering');
+
+// 頁面用固定的 lolapp://app 載入，IndexedDB 才不會因為每次 port 不同而換一個新的
+const APP_SCHEME = 'lolapp';
+protocol.registerSchemesAsPrivileged([
+  {scheme: APP_SCHEME, privileges: {standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true}},
+]);
 
 global.auth = {};
 let mainWinId = null
@@ -100,6 +119,16 @@ if (!gotSingleInstanceLock) {
       server.listen(freePort, () => {
         logger.info(`Server running on http://localhost:${freePort}`)
       });
+      // lolapp:// 的請求全部轉給本地 server
+      protocol.handle(APP_SCHEME, (request) => {
+        const {pathname, search} = new URL(request.url);
+        const hasBody = !['GET', 'HEAD'].includes(request.method);
+        return electronNet.fetch(`http://127.0.0.1:${freePort}${pathname}${search}`, {
+          method: request.method,
+          headers: request.headers,
+          ...(hasBody ? {body: request.body, duplex: 'half'} : {}),
+        });
+      });
 
       initTray();
       initTheme()
@@ -175,7 +204,7 @@ function createWindow(freePort) {
   });
   const url = isDev
     ? 'http://localhost:8080'
-    : `http://127.0.0.1:${freePort}`;
+    : `${APP_SCHEME}://app/`;
 
   win.loadURL(url)
   mainWinId = win.id

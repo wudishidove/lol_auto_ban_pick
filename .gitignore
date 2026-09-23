@@ -132,6 +132,8 @@ dist
 .pnp.*
 
 app-config.json
+# 開發時的 userData(快取、IndexedDB)
+/data/
 
 resources/test/
 donate.md

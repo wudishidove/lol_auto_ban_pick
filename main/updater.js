@@ -243,6 +243,8 @@ function assertWritable(dir) {
 const SWAP_SCRIPT = [
   '@echo off',
   'setlocal',
+  // 工作目錄不能留在暫存資料夾，不然重新啟動的程式會鎖住它，刪不掉
+  'cd /d "%LOLAPP_DST%"',
   // PATH 裡可能有同名的程式(例: Git 的 find.exe)，一律用完整路徑
   'set "SYS=%SystemRoot%\\System32"',
   'set /a tries=0',
@@ -251,16 +253,22 @@ const SWAP_SCRIPT = [
   // (腳本以 detached 無主控台方式啟動，tasklist | find 這種管線會卡住，不能用)
   '2>nul ( >>"%LOLAPP_EXE%" (call ) ) && goto copy',
   'set /a tries+=1',
-  'if %tries% GEQ 60 goto launch',
+  'if %tries% GEQ 60 goto failed',
   '"%SYS%\\ping.exe" -n 2 127.0.0.1 >nul',
   'goto wait',
   ':copy',
-  // 不用 /MIR 覆蓋整個資料夾，保留 app-config.json 與使用者自己放的檔案
+  // 不用 /MIR 覆蓋整個資料夾，保留 app-config.json、data 與使用者自己放的檔案
   '"%SYS%\\robocopy.exe" "%LOLAPP_SRC%" "%LOLAPP_DST%" /E /R:20 /W:1 /NP /NFL /NDL /LOG+:"%LOLAPP_LOG%" >nul 2>&1',
-  'if errorlevel 8 goto launch',
+  'if errorlevel 8 goto failed',
   // build 裡的檔名帶 hash，每版都不同，舊的要清掉
   '"%SYS%\\robocopy.exe" "%LOLAPP_SRC%\\resources\\app\\build" "%LOLAPP_DST%\\resources\\app\\build" /MIR /R:20 /W:1 /NP /NFL /NDL /LOG+:"%LOLAPP_LOG%" >nul 2>&1',
-  ':launch',
+  'if errorlevel 8 goto failed',
+  'start "" "%LOLAPP_EXE%"',
+  // 成功就把整個暫存資料夾(含這支腳本)刪掉，(goto) 讓腳本先結束再刪
+  // 腳本結束時隱含的 endlocal 會把工作目錄還原，所以要再切一次
+  '(goto) 2>nul & cd /d "%LOLAPP_DST%" & rmdir /s /q "%LOLAPP_WORK%"',
+  ':failed',
+  // 失敗時留下 swap.log 方便查原因
   'start "" "%LOLAPP_EXE%"',
   'rmdir /s /q "%LOLAPP_SRC_ROOT%" >nul 2>&1',
   'del /q "%LOLAPP_ZIP%" >nul 2>&1',
@@ -314,6 +322,7 @@ async function prepareUpdate(onProgress, {appDir = path.dirname(process.execPath
         LOLAPP_DST: appDir,
         LOLAPP_EXE: path.join(appDir, exeName),
         LOLAPP_ZIP: zipPath,
+        LOLAPP_WORK: workDir,
         LOLAPP_LOG: path.join(workDir, 'swap.log'),
       },
     });
