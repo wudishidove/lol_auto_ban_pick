@@ -18,12 +18,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: yarn
+          cache: npm
 
-      - run: yarn install --frozen-lockfile
+      - run: npm ci
 
       # CRA 在 CI=true 時會把 eslint warning 當成錯誤
-      - run: yarn make-both
+      - run: npm run make-both
         env:
           CI: false
 
