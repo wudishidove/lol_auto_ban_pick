@@ -10,10 +10,18 @@ const RELEASE_API = 'https://api.github.com/repos/wudishidove/lol_auto_ban_pick/
 const ALLOWED_HOSTS = ['github.com', 'githubusercontent.com'];
 const REQUEST_TIMEOUT_MS = 30 * 1000;
 const PROGRESS_INTERVAL_MS = 200;
-// GitHub 的 release CDN 常常單一連線只有幾十 KB/s，分段用多條連線同時下載
+// GitHub 的 release CDN 單一連線常常只有幾十 KB/s，而且每條快慢差很多，分段用多條連線同時下載
 const SEGMENT_SIZE = 2 * 1024 * 1024;
-const MAX_CONNECTIONS = 16;
-const SEGMENT_RETRIES = 3;
+const MAX_CONNECTIONS = 32;
+// 閒下來的連線會把別人剩下的切一半來抓，每份至少這麼大
+const MIN_SPLIT_SIZE = 128 * 1024;
+// 這麼久沒收到資料就斷線重連，從斷點繼續
+const STALL_TIMEOUT_MS = 10 * 1000;
+// 同一段連續失敗且完全沒進度才放棄
+const RANGE_RETRIES = 8;
+
+// keep-alive 讓同一條連線接著抓下一段，不用每段都重新握手
+const downloadAgent = new https.Agent({keepAlive: true, maxSockets: MAX_CONNECTIONS});
 
 let isInstalling = false;
 
@@ -47,6 +55,7 @@ function request(url, headers = {}, redirectsLeft = 5) {
       headers: {'User-Agent': `lol-auto-accept/${app.getVersion()}`, ...headers},
       // main.js 為了 LCU 的自簽憑證全域關閉了憑證驗證，更新檔是可執行檔，這裡必須驗證
       rejectUnauthorized: true,
+      agent: downloadAgent,
     }, res => {
       if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location) {
         res.resume();
@@ -59,9 +68,10 @@ function request(url, headers = {}, redirectsLeft = 5) {
       }
       if (res.statusCode !== 200 && res.statusCode !== 206) {
         res.resume();
-        reject(new Error(`HTTP ${res.statusCode}`));
+        reject(Object.assign(new Error(`HTTP ${res.statusCode}`), {statusCode: res.statusCode}));
         return;
       }
+      res.finalUrl = url;
       resolve(res);
     });
     req.setTimeout(REQUEST_TIMEOUT_MS, () => req.destroy(new Error('request timeout')));
@@ -134,55 +144,104 @@ async function downloadSingle(url, dest, expectedSize, onProgress) {
   progress.done();
 }
 
-async function downloadSegment(url, handle, start, end, progress) {
-  let written = 0;
-  try {
-    const res = await request(url, {Range: `bytes=${start}-${end}`});
-    if (res.statusCode !== 206) {
-      res.destroy();
-      throw new Error('range request not supported');
-    }
-    for await (const chunk of res) {
-      if (start + written + chunk.length > end + 1) throw new Error('segment overflow');
-      await handle.write(chunk, 0, chunk.length, start + written);
-      written += chunk.length;
-      progress.add(chunk.length);
-    }
-    if (written !== end - start + 1) throw new Error(`segment incomplete: ${written}/${end - start + 1}`);
-  } catch (error) {
-    progress.add(-written); // 這段會整個重抓
-    throw error;
-  }
+// 跟著 github.com 的重導拿到 CDN 的簽章網址(約一小時有效)，之後每段直接連 CDN
+async function resolveDownloadUrl(url) {
+  const res = await request(url, {Range: 'bytes=0-0'});
+  res.resume();
+  return {url: res.finalUrl, acceptsRanges: res.statusCode === 206};
 }
 
-async function downloadParallel(url, dest, size, onProgress) {
-  const segments = [];
-  for (let start = 0; start < size; start += SEGMENT_SIZE) {
-    segments.push({start, end: Math.min(start + SEGMENT_SIZE, size) - 1});
+// 抓 range.pos ~ range.end，pos 隨寫入前進；end 可能被別的連線切走一半而變小
+async function fetchRange(url, handle, range, progress) {
+  const res = await request(url, {Range: `bytes=${range.pos}-${range.end}`});
+  if (res.statusCode !== 206) {
+    res.destroy();
+    throw new Error('range request not supported');
   }
+  let stallTimer;
+  const resetStallTimer = () => {
+    clearTimeout(stallTimer);
+    stallTimer = setTimeout(() => res.destroy(new Error('stalled')), STALL_TIMEOUT_MS);
+  };
+  resetStallTimer();
+  try {
+    for await (const chunk of res) {
+      resetStallTimer();
+      const length = Math.min(chunk.length, range.end - range.pos + 1);
+      if (length > 0) {
+        // 先推進 pos 再寫檔，切段時才不會切到正在寫的這塊
+        const position = range.pos;
+        range.pos += length;
+        await handle.write(chunk, 0, length, position);
+        progress.add(length);
+      }
+      if (range.pos > range.end) break;
+    }
+  } finally {
+    clearTimeout(stallTimer);
+    res.destroy();
+  }
+  if (range.pos <= range.end) throw new Error('connection closed early');
+}
+
+async function downloadParallel(sourceUrl, url, dest, size, onProgress) {
+  const ranges = [];
+  for (let start = 0; start < size; start += SEGMENT_SIZE) {
+    ranges.push({pos: start, end: Math.min(start + SEGMENT_SIZE, size) - 1, active: false, failures: 0});
+  }
+  const takeRange = () => {
+    const idle = ranges.find(r => !r.active && r.pos <= r.end);
+    if (idle) return idle;
+    // 沒有待抓的段了，把還在抓、剩最多的那段切一半過來，避免最後只剩幾條慢連線在跑
+    const busiest = ranges
+      .filter(r => r.active)
+      .reduce((a, b) => (!a || b.end - b.pos > a.end - a.pos ? b : a), null);
+    if (!busiest || busiest.end - busiest.pos + 1 < MIN_SPLIT_SIZE * 2) return null;
+    const mid = busiest.pos + Math.floor((busiest.end - busiest.pos + 1) / 2);
+    const stolen = {pos: mid, end: busiest.end, active: false, failures: 0};
+    busiest.end = mid - 1;
+    ranges.push(stolen);
+    return stolen;
+  };
+
+  let currentUrl = url;
+  let refreshing = null;
+  // 簽章網址過期(403)就重新跟 github.com 要一次
+  const refreshUrl = () => refreshing || (refreshing = resolveDownloadUrl(sourceUrl)
+    .then(resolved => { currentUrl = resolved.url; })
+    .finally(() => { refreshing = null; }));
+
   const progress = createProgressReporter(size, onProgress);
   const handle = await fs.promises.open(dest, 'w');
-  let next = 0;
   let failure = null;
   const worker = async () => {
-    while (!failure && next < segments.length) {
-      const {start, end} = segments[next++];
-      for (let attempt = 1; !failure; attempt++) {
-        try {
-          await downloadSegment(url, handle, start, end, progress);
-          break;
-        } catch (error) {
-          if (attempt >= SEGMENT_RETRIES) failure = error;
+    for (let range = takeRange(); range && !failure; range = takeRange()) {
+      range.active = true;
+      const startPos = range.pos;
+      try {
+        await fetchRange(currentUrl, handle, range, progress);
+      } catch (error) {
+        // 有抓到東西就不算失敗，下次從斷點繼續
+        range.failures = range.pos > startPos ? 0 : range.failures + 1;
+        if (range.failures >= RANGE_RETRIES) {
+          failure = error;
+        } else if (error.statusCode === 403) {
+          await refreshUrl().catch(() => {});
+        } else if (range.failures > 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * range.failures));
         }
+      } finally {
+        range.active = false;
       }
     }
   };
   try {
-    await Promise.all(Array.from({length: Math.min(MAX_CONNECTIONS, segments.length)}, worker));
+    await Promise.all(Array.from({length: Math.min(MAX_CONNECTIONS, ranges.length)}, worker));
   } finally {
     await handle.close();
   }
   if (failure) throw failure;
+  if (ranges.some(r => r.pos <= r.end)) throw new Error('download incomplete');
   progress.done();
 }
 
@@ -197,15 +256,15 @@ function hashFile(filePath) {
 }
 
 async function downloadFile(url, dest, expectedSize, onProgress) {
-  if (expectedSize > SEGMENT_SIZE) {
-    try {
-      await downloadParallel(url, dest, expectedSize, onProgress);
-    } catch (error) {
-      logger.error(`[updater] parallel download failed: ${error.message}, fallback to single connection`);
-      await downloadSingle(url, dest, expectedSize, onProgress);
+  try {
+    const resolved = await resolveDownloadUrl(url);
+    if (resolved.acceptsRanges && expectedSize > SEGMENT_SIZE) {
+      await downloadParallel(url, resolved.url, dest, expectedSize, onProgress);
+    } else {
+      await downloadSingle(resolved.url, dest, expectedSize, onProgress);
     }
-  } else {
-    await downloadSingle(url, dest, expectedSize, onProgress);
+  } finally {
+    downloadAgent.destroy(); // 關掉閒置的 keep-alive 連線
   }
   return {size: fs.statSync(dest).size, sha256: await hashFile(dest)};
 }
