@@ -6,7 +6,7 @@ const crypto = require('crypto');
 const {spawn, execFile} = require('child_process');
 const logger = require('./logger');
 
-const RELEASE_API = 'https://api.github.com/repos/wudishidove/lol_auto_accept2/releases/latest';
+const RELEASE_API = 'https://api.github.com/repos/wudishidove/lol_auto_ban_pick/releases/latest';
 const ALLOWED_HOSTS = ['github.com', 'githubusercontent.com'];
 const REQUEST_TIMEOUT_MS = 30 * 1000;
 const PROGRESS_INTERVAL_MS = 200;

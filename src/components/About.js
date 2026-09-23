@@ -62,7 +62,7 @@ function About(props) {
           <br/>
           <a href="" style={{fontSize: "16px"}}
              onClick={(event) => {
-               handleClickLink(event, 'https://github.com/wudishidove/lol_auto_accept2')
+               handleClickLink(event, 'https://github.com/wudishidove/lol_auto_ban_pick')
              }}>{t('about.github')}
           </a>
         </p>

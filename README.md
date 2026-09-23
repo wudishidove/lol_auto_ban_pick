@@ -1,5 +1,5 @@
 <div align=center>
-<h1>LOL自動接受輔助工具</h1>
+<h1>LOL列隊神器</h1>
 </div>
 
 <div align="center">
@@ -7,39 +7,32 @@
 ![Static Badge](https://img.shields.io/badge/react-18.2.0-blue)
 ![Static Badge](https://img.shields.io/badge/electron-28.3.3-blue)
 
-[![GitHub release](https://img.shields.io/github/v/release/wudishidove/lol_auto_accept2?include_prereleases)](https://github.com/wudishidove/lol_auto_accept2/releases)
-![downloads](https://img.shields.io/github/downloads/wudishidove/lol_auto_accept2/total)
+[![GitHub release](https://img.shields.io/github/v/release/wudishidove/lol_auto_ban_pick?include_prereleases)](https://github.com/wudishidove/lol_auto_ban_pick/releases)
+![downloads](https://img.shields.io/github/downloads/wudishidove/lol_auto_ban_pick/total)
 
 </div>
 
 <div align=center>
-  本程式可幫你自動接受英雄聯盟的對戰，還提供一些額外實用的功能
+  <b>列隊等半天，想上廁所又不敢去？</b><br/>
+  怕一離開就錯過「接受」、怕回來發現自己的本命被 ban、怕選角時間到被踢出去……<br/>
+  別憋了！快來試試 <b>LOL列隊神器</b> 🚽
 </div>
 
 [English](./README_en.md) | 中文
 
-## 🍴 關於此版本
-本專案修改自 [jasonwu1994/lol-auto-accept](https://github.com/jasonwu1994/lol-auto-accept)，原版功能與程式架構皆出自原作者 **jasonwu1994**，感謝原作者的開源分享。  
-此版本在原版 v1.5.2 的基礎上，新增「選ban角」分頁與選角自動化功能：
+## 🚽 你負責上廁所，剩下交給它
+- 🚀 **自動接受對戰**：排到了 1 秒內幫你按接受，人不在也不怕被罰
+- 🚫 **自動 ban 角**：照你排好的順序自動禁用，第一順位不能 ban 就往下找
+- 🎯 **自動預選＋遞補**：開場幫你亮出想玩的英雄，被 ban 被搶就自動換下一隻
+- 🔒 **自動鎖角**：剩 1 秒還沒回來？直接幫你鎖，不會因為在洗手就被踢出選角
+- 📜 **符文設定檔**：依「路線＋英雄＋對位」自動套用符文，回到座位直接開打
+- 🏆 **情報一手掌握**：隊友積分、雙排偵測、列隊規則，選角時就知道隊友底細
+- 🎲 **ARAM 自動搶角**：先勾好想要的英雄，隊友一骰出來就幫你換過來
+- 🔄 **一鍵更新**：有新版本自動提醒，按一下就更新好
 
-| 新功能 | 說明 |
-|---|---|
-| 🚫 自動禁用英雄 | 輪到自己禁用時，依優先順序自動選取／禁用；第一順位不能禁用時自動往下一順位找 |
-| 🎯 自動預選英雄 | 選角開場自動亮出想玩的英雄，只在開場做一次，不會蓋掉你自己的選擇 |
-| 🔁 預選遞補 | 勾選後，自動預選的英雄被禁用(或被選走)時，自動改預選清單中下一順位的英雄；你自己改選的不會被覆蓋 |
-| 🔒 自動鎖角 | 該場自動預選成功時，輪到你選角且時間剩 1 秒會自動鎖定當下亮著的英雄 |
-| 🗂 全局／路線排序 | 禁用與預選都可設定一份全局清單，以及上路／打野／中路／下路／輔助各自獨立的清單；路線未設定時自動使用全局清單 |
-| 🤝 無視隊友預選角 | 勾選後，就算隊友預選了該英雄也照樣禁用；未勾選則跳過改禁下一順位 |
-| ✋ 只選取，不送出確認 | 只幫你選好要禁用的英雄，可以反悔改選；時間到時遊戲會自動送出 |
-| 🎲 隨機候選 | 每場從預選池中隨機挑一隻來預選 |
-| 🔎 英文搜尋 | 英雄選單顯示中文，但可用英文名稱搜尋(例: `zed`、`lee sin`、`kaisa`) |
+一句話：**讓你列隊時輕鬆上廁所、裝水、泡麵，完全無負擔。** 💧
 
-<p float="left">
-  <img src="resources/github/screenshot/zh/banpick_ban.jpg" width="48%" />
-  <img src="resources/github/screenshot/zh/banpick_pick.jpg" width="48%" />
-</p>
-
-主頁提供「自動禁用英雄／自動預選英雄／自動鎖角」的快速開關，英雄清單與細部選項在「選ban角」分頁設定。設定變更會即時存檔。
+> 本專案修改自 [jasonwu1994/lol-auto-accept](https://github.com/jasonwu1994/lol-auto-accept)，感謝原作者 **jasonwu1994** 的開源分享。
 
 ## ✨ 功能
 1. **🚀自動接受對戰**：1秒內會自動接受對戰  
@@ -56,6 +49,11 @@
    可開啟隨機候選，每場從預選池中隨機挑一隻  
    可開啟預選遞補，預選的英雄被禁用(或被選走)時，自動改預選下一順位
 9. **🔒自動鎖角**：自動預選成功的那場，輪到你選角且時間剩 1 秒時自動鎖定當下亮著的英雄(中途改選也算)
+10. **📜符文設定檔**：進遊戲時自動記錄該場符文，賽後補上對位存成設定檔，也可以從對戰紀錄匯入  
+    選角鎖定英雄後，依「路線＋英雄＋對位」自動套用符文設定檔
+11. **🔄自動更新**：啟動時(之後每 3 小時)檢查是否有新版本，可在程式內一鍵下載更新
+
+主頁有「自動禁用英雄／自動預選英雄／自動鎖角」的快速開關，英雄清單與細部選項在「選ban角」分頁設定，英雄可用英文名稱搜尋(例: `zed`、`lee sin`)。設定變更會即時存檔。
 
 ## 🌟 說明
 - **超低CPU使用率**：使用訂閱事件的方式，只有特定事件發生時，程式才會運作，其他時候CPU使用率幾乎為0
@@ -107,6 +105,6 @@
 ## ⚖️ 免責聲明
 本程式是非官方的第三方工具，僅透過本機的 League Client (LCU) API 與你自己的遊戲客戶端溝通，不會注入或修改任何遊戲檔案。使用風險請自行評估。
 
-> LOL自動接受輔助工具 isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
+> LOL列隊神器 isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
 
 隱私權說明請見 [PRIVACY.md](./PRIVACY.md)。

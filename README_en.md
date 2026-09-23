@@ -1,5 +1,5 @@
 <div align=center>
-<h1>LOL Auto-Accept Assistant Tool</h1>
+<h1>LoL Auto Ban Pick</h1>
 </div>
 
 <div align="center">
@@ -7,39 +7,32 @@
 ![Static Badge](https://img.shields.io/badge/react-18.2.0-blue)
 ![Static Badge](https://img.shields.io/badge/electron-28.3.3-blue)
 
-[![GitHub release](https://img.shields.io/github/v/release/wudishidove/lol_auto_accept2?include_prereleases)](https://github.com/wudishidove/lol_auto_accept2/releases)
-![downloads](https://img.shields.io/github/downloads/wudishidove/lol_auto_accept2/total)
+[![GitHub release](https://img.shields.io/github/v/release/wudishidove/lol_auto_ban_pick?include_prereleases)](https://github.com/wudishidove/lol_auto_ban_pick/releases)
+![downloads](https://img.shields.io/github/downloads/wudishidove/lol_auto_ban_pick/total)
 
 </div>
 
 <div align=center>
-  This application automatically accepts League of Legends matches for you and provides several additional handy features.
+  <b>Stuck in queue forever and too scared to go to the bathroom?</b><br/>
+  Afraid you'll miss the "Accept" button, come back to find your main banned, or get kicked from champ select...<br/>
+  Hold it no more! Say hello to <b>LoL Auto Ban Pick</b> 🚽
 </div>
 
 English | [中文](./README.md)
 
-## 🍴 About this fork
-This project is a modified version of [jasonwu1994/lol-auto-accept](https://github.com/jasonwu1994/lol-auto-accept). The original features and architecture were created by **jasonwu1994** — many thanks for open-sourcing it.  
-On top of the original v1.5.2, this fork adds a "Ban/Pick" page and champion select automation:
+## 🚽 You handle the bathroom break, it handles the rest
+- 🚀 **Auto accept**: accepts the match within 1 second, even when you're away from your desk
+- 🚫 **Auto ban**: bans by your priority list, moving down the list if the first one can't be banned
+- 🎯 **Auto hover + fallback**: hovers the champion you want, and switches to the next one if it gets banned or picked
+- 🔒 **Auto lock in**: still not back with 1 second left? It locks in for you, so you don't get dodged while washing your hands
+- 📜 **Rune profiles**: applies runes automatically by lane + champion + matchup, so you're ready the moment you sit down
+- 🏆 **Scouting report**: teammate ranks, duo detection and selected roles, right in champ select
+- 🎲 **ARAM auto grab**: pre-select the champions you want and grab them as soon as a teammate rolls one
+- 🔄 **One-click update**: get notified about new versions and update with a single click
 
-| New feature | Description |
-|---|---|
-| 🚫 Auto Ban Champion | On your ban turn, selects / bans a champion following your priority list, falling through to the next one when the first is unavailable |
-| 🎯 Auto Hover Champion | Hovers the champion you want to play once at the start of champion select, never overriding your own choice |
-| 🔁 Hover fallback | When checked, if the auto-hovered champion gets banned (or picked), the next champion in the list is hovered instead; a champion you chose yourself is never overridden |
-| 🔒 Auto Lock In | When the auto hover succeeded this game, locks in whatever is hovered with 1 second left on your pick turn |
-| 🗂 Global / per-lane lists | Both ban and hover support one global list plus independent lists for Top / Jungle / Mid / Bot / Support; lanes without a list fall back to the global one |
-| 🤝 Ignore teammates' hovered champions | When checked, bans the champion even if a teammate is hovering it; otherwise it is skipped |
-| ✋ Select only, do not lock in | Only selects the champion to ban so you can still change your mind; the game locks it in when the timer runs out |
-| 🎲 Random candidate | Hovers a random champion from your pool each game |
-| 🔎 English search | Champion lists can always be searched by English name (e.g. `zed`, `lee sin`, `kaisa`) |
+In short: **go to the bathroom, grab a drink, make some instant noodles, all while you queue, stress-free.** 💧
 
-<p float="left">
-  <img src="resources/github/screenshot/en/banpick_ban.jpg" width="48%" />
-  <img src="resources/github/screenshot/en/banpick_pick.jpg" width="48%" />
-</p>
-
-The home page has quick toggles for Auto Ban / Auto Hover / Auto Lock In; champion lists and detailed options live in the "Ban/Pick" page. Settings are saved instantly.
+> This project is a modified version of [jasonwu1994/lol-auto-accept](https://github.com/jasonwu1994/lol-auto-accept). Many thanks to the original author **jasonwu1994** for open-sourcing it.
 
 ## ✨ Features
 1. **🚀 Auto-Accept Matches**: Automatically accepts matches within 1 second.  
@@ -52,6 +45,11 @@ The home page has quick toggles for Auto Ban / Auto Hover / Auto Lock In; champi
 7. **🚫 Auto Ban Champion**: When it is your turn to ban, automatically bans a champion following your priority list. Supports a global list or independent per-lane lists (falls back to the global list when the lane is not set). You can choose whether to skip champions hovered by teammates, or to only select the champion without locking it in.
 8. **🎯 Auto Hover Champion**: Hovers the champion you want to play at the start of champion select, with the same global / per-lane lists. Optionally picks a random champion from your pool each game, and optionally hovers the next one in the list when the hovered champion gets banned (or picked).
 9. **🔒 Auto Lock In**: When the auto hover succeeded this game, locks in whatever is hovered (including your own change) with 1 second left on your pick turn.
+10. **📜 Rune Profiles**: Records your runes when a game starts and saves them as a profile with the matchup filled in after the game; profiles can also be imported from match history.  
+    After you lock in a champion, the matching profile for your lane + champion + matchup is applied automatically.
+11. **🔄 Auto Update**: Checks for a new version at startup (and every 3 hours after that), and lets you download and install it from inside the app with one click.
+
+The home page has quick toggles for Auto Ban / Auto Hover / Auto Lock In; champion lists and detailed options live in the "Ban/Pick" page, and champions can always be searched by English name (e.g. `zed`, `lee sin`). Settings are saved instantly.
 
 ## 🌟 Description
 - **Ultra-Low CPU Usage**: Operates using event subscriptions, so the program only activates during specific events, resulting in near-zero CPU usage otherwise.
@@ -103,6 +101,6 @@ The home page has quick toggles for Auto Ban / Auto Hover / Auto Lock In; champi
 ## ⚖️ Disclaimer
 This is an unofficial third-party tool. It talks only to your own game client through the local League Client (LCU) API and never injects into or modifies any game file. Use it at your own risk.
 
-> LOL Auto Accept isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
+> LoL Auto Ban Pick isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
 
 See [PRIVACY.md](./PRIVACY.md) for the privacy notice.
