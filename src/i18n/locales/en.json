@@ -1,0 +1,253 @@
+{
+  "menu": {
+    "main": "Home",
+    "duo": "Duo",
+    "rank": "Rank",
+    "recentPlayers": "Recent",
+    "banPick": "Ban/Pick",
+    "runes": "Runes",
+    "aram": "ARAM",
+    "selectedRole": "Role",
+    "about": "About"
+  },
+  "main": {
+    "acceptMatchmaking": "Accept Matchmaking",
+    "declineMatchmaking": "Decline Matchmaking",
+    "forceKillLoL": "Force Close LOL",
+    "autoAccept": "Auto Accept Match",
+    "autoBan": "Auto Ban Champion",
+    "autoBanPlaceholder": "Select champions to ban, in priority order",
+    "autoPickIntent": "Auto Hover Champion",
+    "autoPickLock": "Auto Lock In",
+    "banPickHint": "Set champion lists and options in the \"Ban/Pick\" page",
+    "displayTeammateScore": "Show teammates score during Champion Selection",
+    "displayRecentTeammate": "Show recent teammates during Champion Selection",
+    "showTeammateRankedType": {
+      "soloDuo": "Solo/Duo",
+      "flex": "Flex",
+      "both": "Solo/Duo/Flex"
+    },
+    "modifyHovercard": "Modify Hovercard",
+    "rankedType": {
+      "soloDuo": "Solo/Duo",
+      "flex": "Flex",
+      "flexSR": "Flex 5x5",
+      "flexTT": "Flex 3x3",
+      "tft": "Teamfight Tactics",
+      "tftDoubleUp": "TFT: Double Up",
+      "tftTurbo": "TFT: Turbo"
+    },
+    "tierType": {
+      "challenger": "Challenger",
+      "grandmaster": "Grandmaster",
+      "master": "Master",
+      "diamond": "Diamond",
+      "platinum": "Platinum",
+      "gold": "Gold",
+      "silver": "Silver",
+      "bronze": "Bronze",
+      "iron": "Iron"
+    },
+    "appStates": {
+      "lolNotOpen": "LoL not open",
+      "lolClosed": "LoL closed",
+      "lolStarting": "LoL starting"
+    },
+    "closedProcessesCount": "Closed {{count}} processes"
+  },
+  "gamePhases": {
+    "none": "Game Lobby",
+    "lobby": "In Lobby",
+    "matchmaking": "Matchmaking",
+    "readyCheck": "Ready Check",
+    "champSelect": "Champion Selection",
+    "gameStart": "Game Start",
+    "inProgress": "In Progress",
+    "preEndOfGame": "Pre-End of Game",
+    "endOfGame": "End of Game"
+  },
+  "banPick": {
+    "banTab": "Ban",
+    "pickTab": "Hover (Pick)",
+    "currentLane": "Current lane",
+    "noLane": "No lane",
+    "inUse": "In use",
+    "global": "Global",
+    "globalFallback": "Global (fallback)",
+    "lanePlaceholder": "Not set, uses the global list",
+    "mode": {
+      "global": "Global list",
+      "lane": "Lane list first",
+      "globalHint": "Always use the same list regardless of lane",
+      "laneHint": "Uses the list of your assigned lane. Falls back to the global list when that lane is not set or there is no lane assignment (custom, blind pick)"
+    },
+    "lanes": {
+      "top": "Top",
+      "jungle": "Jungle",
+      "middle": "Mid",
+      "bottom": "Bot",
+      "utility": "Support"
+    },
+    "ban": {
+      "ignoreTeammateIntent": "Ignore teammates' hovered champions",
+      "ignoreTeammateIntentHint": "When checked, bans the champion even if a teammate is hovering it. Otherwise it is skipped and the next one is banned",
+      "hoverOnly": "Select only, do not lock in",
+      "hoverOnlyHint": "Only selects the champion to ban so you can still change it or lock it in yourself. The game locks in the current selection when the timer runs out"
+    },
+    "pick": {
+      "description": "Hovers the champion you want to play only at the start of champion select, never after the ban phase begins (except for the fallback option below). Picked and teammate-hovered champions are skipped",
+      "lockHint": "When the auto hover succeeded this game, locks in with 1 second left on your pick turn (locks whatever is hovered at that moment, including your own change). If the hovered champion got banned, the next available one in the list is locked instead",
+      "random": "Random candidate",
+      "randomHint": "When checked, a random champion from the pool is hovered each game. Otherwise the first available one in priority order",
+      "rehover": "Hover the next one when the hovered champion gets banned",
+      "rehoverHint": "When the auto-hovered champion gets banned (or picked by another player), hovers the next available one in the list. Never overrides a champion you chose yourself, and does nothing when the list has no other champion",
+      "placeholder": "Select champions to hover, in priority order",
+      "poolPlaceholder": "Select the champion pool, one is picked at random each game"
+    }
+  },
+  "runes": {
+    "profilesTab": "Rune profiles",
+    "matchesTab": "Recent matches",
+    "autoRecord": "Auto record runes every game",
+    "autoRecordHint": "Records your runes when the game starts and adds the actual lane opponent afterwards, saved as a \"lane + champion + opponent\" profile. The latest game wins for the same matchup; pinned profiles are never overwritten. Only modes with assigned lanes are recorded",
+    "autoApply": "Auto apply in champ select",
+    "autoApplyHint": "After you lock in, guesses your lane opponent from the revealed enemy champions and applies the matching profile, falling back to \"Any\". It writes a temporary rune page (name starts with AutoRune) that takes no page slot and never touches your own pages",
+    "allLanes": "All",
+    "filterChampion": "Filter champion",
+    "add": "New profile",
+    "addMatchup": "Add matchup",
+    "emptyHint": "No rune profiles yet. Star a recent match, add one manually, or play a few games with auto record on",
+    "emptyFiltered": "No profiles match the filter",
+    "gotoMatches": "Pick from recent matches",
+    "anyEnemy": "Any",
+    "anyEnemyOption": "Any (all opponents)",
+    "myChampion": "My champion",
+    "enemyChampion": "Opponent",
+    "pin": "Pin, never overwritten by auto record",
+    "pinHint": "Auto record will not overwrite a pinned profile for the same lane + champion + opponent",
+    "pinnedHint": "Pinned: auto record will not overwrite. Click to unpin",
+    "unpinnedHint": "Not pinned: auto record overwrites it next time you meet this matchup. Click to pin",
+    "applyHint": "Apply to the client now (creates a temporary rune page that takes no slot and never touches your own pages)",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this profile?",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saved": "Saved",
+    "applied": "Applied to the client",
+    "applyFailed": "Apply failed. Make sure the LoL client is running and the runes still exist",
+    "runeDataFailed": "Failed to load rune data, please check your network",
+    "source": {
+      "auto": "Auto",
+      "history": "Match history",
+      "manual": "Manual"
+    },
+    "queues": {
+      "400": "Normal",
+      "420": "Ranked Solo",
+      "440": "Ranked Flex",
+      "700": "Clash"
+    },
+    "champSelect": {
+      "title": "Champ select",
+      "opponent": "Guessed opponent",
+      "opponentUnknown": "not revealed yet",
+      "noProfile": "No profile for this champion in this lane yet",
+      "pickHint": "Wrong guess? Click one to apply it; auto apply stops for this game",
+      "matched": "match"
+    },
+    "matches": {
+      "time": "Time",
+      "matchup": "Lane / Me vs opponent",
+      "runes": "Runes",
+      "saveColumn": "Save",
+      "refresh": "Refresh",
+      "hint": "Only modes with assigned lanes are listed. Click the star to save that game's runes as a profile",
+      "busyHint": "Match history loading is paused during champ select and in game to avoid disturbing the client",
+      "loadFailed": "Failed to load match history. Make sure the LoL client is running",
+      "empty": "No matches to show",
+      "win": "Win",
+      "lose": "Loss",
+      "star": "Save as profile",
+      "starOverwrite": "This matchup already has a different profile; saving overwrites it",
+      "saved": "Saved. Click to remove",
+      "unstarConfirm": "Remove the profile for this matchup?",
+      "shardNotice": "Match history has no stat shards. Pick the three shards at the bottom right, then save",
+      "shardNoticePrefilled": "Match history has no stat shards. Shards were prefilled from an existing profile of this champion; confirm or change them, then save"
+    },
+    "editor": {
+      "addTitle": "New rune profile",
+      "editTitle": "Edit rune profile",
+      "importCurrent": "Import current rune page from client",
+      "importFailed": "Import failed. Make sure the LoL client is running",
+      "incomplete": "Pick a champion and all 9 runes",
+      "willOverwrite": "A profile with the same lane + champion + opponent exists; saving overwrites it",
+      "championPlaceholder": "Select champion",
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "shards": "Stat shards",
+      "keystone": "Keystone",
+      "row": "Row {{index}}",
+      "pickPrimaryStyle": "Pick a primary path first",
+      "pickSubStyle": "Pick a secondary path first",
+      "shardOffense": "Offense",
+      "shardFlex": "Flex",
+      "shardDefense": "Defense"
+    }
+  },
+  "aram": {
+    "alwaysOnTop": "Always On Top",
+    "clear": "Clear",
+    "champion": "Champion",
+    "summoner": "Summoner",
+    "isYou": "You",
+    "balanceTab": "Balance",
+    "pickTab": "Pick",
+    "balance": {
+      "damage_dealt": "Damage Dealt",
+      "damage_taken": "Damage Taken",
+      "healing": "Healing",
+      "shield_mod": "Shield Mod",
+      "tenacity": "Tenacity",
+      "energy_regeneration": "Energy Regen",
+      "ability_haste": "Ability Haste",
+      "attack_speed_scaling": "Attack Speed"
+    }
+  },
+  "about": {
+    "author": "Author",
+    "currentVersion": "Current Version",
+    "latestVersion": "Latest Version",
+    "help": "If you find this project useful, consider giving it a star ⭐\uFE0F！\n<br/>\nYour support is highly appreciated！\n",
+    "github": "View on GitHub",
+    "credit": "Based on the original project, thanks to the original author jasonwu1994: ",
+    "disclaimer": "LOL Auto Accept isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.",
+    "autoCheckUpdate": "Check for updates on startup",
+    "checkUpdate": "Check for Updates",
+    "updateNow": "Update Now",
+    "upToDate": "You are up to date",
+    "checkFailed": "Failed to check for updates"
+  },
+  "update": {
+    "title": "New version {{version}} available",
+    "later": "Later",
+    "viewRelease": "View Release Page",
+    "install": "Update Now",
+    "downloading": "Downloading",
+    "restarting": "Download complete, restarting to install the update...",
+    "failed": "Update failed. Please try again later, or download it manually from the release page"
+  },
+  "common": {
+    "teamOne": "Blue Team",
+    "teamTwo": "Red Team",
+    "premade": {
+      "solo": "Solo",
+      "duo": "Duo",
+      "trio": "Trio",
+      "quad": "Quad",
+      "quint": "Quint"
+    },
+    "copy_success": "Copied",
+    "copy_failure": "Copy failed"
+  }
+}

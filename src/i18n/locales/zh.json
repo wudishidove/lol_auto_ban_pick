@@ -1,0 +1,253 @@
+{
+  "menu": {
+    "main": "主頁",
+    "duo": "雙排",
+    "rank": "積分",
+    "recentPlayers": "最近遇過",
+    "banPick": "選ban角",
+    "runes": "符文",
+    "aram": "隨機單中",
+    "selectedRole": "列隊規則",
+    "about": "關於"
+  },
+  "main": {
+    "acceptMatchmaking": "接受對戰",
+    "declineMatchmaking": "拒絕對戰",
+    "forceKillLoL": "強制關閉LOL",
+    "autoAccept": "自動接受對戰",
+    "autoBan": "自動禁用英雄",
+    "autoBanPlaceholder": "選擇要禁用的英雄，依選取順序為優先順序",
+    "autoPickIntent": "自動預選英雄",
+    "autoPickLock": "自動鎖角",
+    "banPickHint": "英雄清單與細部選項請到「選ban角」分頁設定",
+    "displayTeammateScore": "選角時，顯示隊友積分",
+    "displayRecentTeammate": "選角時，顯示最近遇過",
+    "showTeammateRankedType": {
+      "soloDuo": "單雙",
+      "flex": "彈性",
+      "both": "單雙/彈性"
+    },
+    "modifyHovercard": "修改名片",
+    "rankedType": {
+      "soloDuo": "單雙",
+      "flex": "彈性",
+      "flexSR": "彈性5x5",
+      "flexTT": "彈性3x3",
+      "tft": "戰棋",
+      "tftDoubleUp": "雙人搭檔",
+      "tftTurbo": "超級抽抽樂"
+    },
+    "tierType": {
+      "challenger": "菁英",
+      "grandmaster": "宗師",
+      "master": "大師",
+      "diamond": "鑽石",
+      "platinum": "白金",
+      "gold": "金牌",
+      "silver": "銀牌",
+      "bronze": "銅牌",
+      "iron": "鐵牌"
+    },
+    "appStates": {
+      "lolNotOpen": "LOL未開啟",
+      "lolClosed": "LOL已關閉",
+      "lolStarting": "LOL啟動中"
+    },
+    "closedProcessesCount": "已關閉 {{count}} 個處理程序"
+  },
+  "gamePhases": {
+    "none": "遊戲大廳",
+    "lobby": "組隊中",
+    "matchmaking": "列隊等待中",
+    "readyCheck": "已排到對戰，等待接受",
+    "champSelect": "選擇英雄中",
+    "gameStart": "遊戲開始",
+    "inProgress": "遊戲中",
+    "preEndOfGame": "遊戲即將結束",
+    "endOfGame": "遊戲結束"
+  },
+  "banPick": {
+    "banTab": "禁用 (Ban)",
+    "pickTab": "預選 (Pick)",
+    "currentLane": "目前路線",
+    "noLane": "無分路",
+    "inUse": "使用中",
+    "global": "全局",
+    "globalFallback": "全局 (備用)",
+    "lanePlaceholder": "未設定，使用全局排序",
+    "mode": {
+      "global": "全局排序",
+      "lane": "路線排序優先",
+      "globalHint": "不分路線，一律使用同一份清單",
+      "laneHint": "依你被分配到的路線使用對應清單；該路線未設定、或沒有分路(自訂、盲選)時，使用全局清單"
+    },
+    "lanes": {
+      "top": "上路",
+      "jungle": "打野",
+      "middle": "中路",
+      "bottom": "下路",
+      "utility": "輔助"
+    },
+    "ban": {
+      "ignoreTeammateIntent": "無視隊友預選角",
+      "ignoreTeammateIntentHint": "勾選後，就算隊友預選了該英雄也照樣禁用；未勾選則跳過，改禁下一順位",
+      "hoverOnly": "只選取，不送出確認",
+      "hoverOnlyHint": "只幫你選好要禁用的英雄，可以自己改選或按下禁用；時間到時遊戲會自動送出目前選取的英雄"
+    },
+    "pick": {
+      "description": "只在選角開場自動亮出想玩的英雄，禁用階段開始後不再預選(下方的遞補選項除外)。已被選走、隊友預選的英雄會跳過",
+      "lockHint": "該場自動預選成功時，輪到你選角且時間剩 1 秒會自動按下鎖定(鎖定當下亮著的英雄，中途改選也算)；若預選的英雄已被禁用，改鎖清單中下一隻可用的",
+      "random": "隨機候選",
+      "randomHint": "勾選後，每場從預選池中隨機挑一隻；未勾選則依順位挑第一隻可用的",
+      "rehover": "預選被禁用時，自動改選下一順位",
+      "rehoverHint": "自動預選的英雄被禁用(或被其他玩家選走)時，改預選清單中下一隻可用的；你已經自己改選別隻時不會覆蓋，清單沒有其他英雄時不動作",
+      "placeholder": "選擇要預選的英雄，依選取順序為優先順序",
+      "poolPlaceholder": "選擇預選池的英雄，每場隨機挑一隻"
+    }
+  },
+  "runes": {
+    "profilesTab": "符文設定檔",
+    "matchesTab": "近期對戰",
+    "autoRecord": "自動記錄每場符文",
+    "autoRecordHint": "進遊戲時記下該場符文，賽後補上實際對位，存成「路線 + 英雄 + 對位」的設定檔；同一組合以最新一場為準，已鎖定的設定檔不會被覆蓋。只記錄有分路的模式",
+    "autoApply": "選角時自動套用",
+    "autoApplyHint": "鎖定英雄後，依敵方亮出的英雄推測對位並套用符合的設定檔，沒有該對位時改用「通用」。寫入的是不佔頁位的暫時符文頁(名稱以 AutoRune 開頭)，不會動到你自己的符文頁",
+    "allLanes": "全部",
+    "filterChampion": "篩選英雄",
+    "add": "新增設定檔",
+    "addMatchup": "新增對位",
+    "emptyHint": "還沒有符文設定檔。可以從近期對戰按星號存檔、手動新增，或開著自動記錄打幾場",
+    "emptyFiltered": "沒有符合篩選條件的設定檔",
+    "gotoMatches": "從近期對戰挑選",
+    "anyEnemy": "通用",
+    "anyEnemyOption": "通用 (不分對位)",
+    "myChampion": "我的英雄",
+    "enemyChampion": "對位英雄",
+    "pin": "鎖定，不被自動記錄覆蓋",
+    "pinHint": "自動記錄遇到同樣的 路線 + 英雄 + 對位 時，不會覆蓋鎖定的設定檔",
+    "pinnedHint": "已鎖定：自動記錄不會覆蓋，點一下解除",
+    "unpinnedHint": "未鎖定：下次遇到同樣對位時會被自動記錄覆蓋，點一下鎖定",
+    "applyHint": "立即套用到用戶端 (建立不佔頁位的暫時符文頁，不會動到你自己的符文頁)",
+    "edit": "編輯",
+    "delete": "刪除",
+    "deleteConfirm": "確定刪除這個設定檔？",
+    "cancel": "取消",
+    "save": "存檔",
+    "saved": "已存檔",
+    "applied": "已套用到用戶端",
+    "applyFailed": "套用失敗，請確認 LOL 用戶端已開啟，或符文是否已改版失效",
+    "runeDataFailed": "符文資料載入失敗，請確認網路連線",
+    "source": {
+      "auto": "自動記錄",
+      "history": "對戰紀錄",
+      "manual": "手動"
+    },
+    "queues": {
+      "400": "一般",
+      "420": "單雙積分",
+      "440": "彈性積分",
+      "700": "聯盟戰"
+    },
+    "champSelect": {
+      "title": "選角中",
+      "opponent": "推測對位",
+      "opponentUnknown": "尚未亮出",
+      "noProfile": "這隻英雄在這條路線還沒有設定檔",
+      "pickHint": "對位猜錯了？點一下直接改套用，這場就不會再自動變更",
+      "matched": "符合"
+    },
+    "matches": {
+      "time": "時間",
+      "matchup": "路線 / 我 vs 對位",
+      "runes": "主符文",
+      "saveColumn": "存檔",
+      "refresh": "重新整理",
+      "hint": "只列出有分路的模式。按星號把該場符文存成設定檔",
+      "busyHint": "選角與遊戲中暫停讀取對戰紀錄，避免影響用戶端連線",
+      "loadFailed": "讀取對戰紀錄失敗，請確認 LOL 用戶端已開啟",
+      "empty": "沒有可顯示的對戰",
+      "win": "勝",
+      "lose": "敗",
+      "star": "存成設定檔",
+      "starOverwrite": "這個對位已有不同的設定檔，存檔會覆蓋",
+      "saved": "已存檔，點一下移除",
+      "unstarConfirm": "確定移除這個對位的設定檔？",
+      "shardNotice": "對戰紀錄不含屬性碎片，請在右下方選好三個碎片後存檔",
+      "shardNoticePrefilled": "對戰紀錄不含屬性碎片，已先帶入這隻英雄既有設定檔的碎片，請確認或改選後存檔"
+    },
+    "editor": {
+      "addTitle": "新增符文設定檔",
+      "editTitle": "編輯符文設定檔",
+      "importCurrent": "匯入用戶端目前的符文頁",
+      "importFailed": "匯入失敗，請確認 LOL 用戶端已開啟",
+      "incomplete": "請選擇英雄並選滿 9 個符文",
+      "willOverwrite": "已有相同 路線 + 英雄 + 對位 的設定檔，存檔會覆蓋",
+      "championPlaceholder": "選擇英雄",
+      "primary": "主系",
+      "secondary": "副系",
+      "shards": "屬性碎片",
+      "keystone": "基石",
+      "row": "第 {{index}} 列",
+      "pickPrimaryStyle": "先選擇主系",
+      "pickSubStyle": "先選擇副系",
+      "shardOffense": "攻擊",
+      "shardFlex": "彈性",
+      "shardDefense": "防禦"
+    }
+  },
+  "aram": {
+    "alwaysOnTop": "保持最上層",
+    "clear": "清空",
+    "champion": "英雄",
+    "summoner": "召喚師",
+    "isYou": "這是你",
+    "balanceTab": "平衡調整",
+    "pickTab": "選角",
+    "balance": {
+      "damage_dealt": "造成傷害",
+      "damage_taken": "承受傷害",
+      "healing": "治療量",
+      "shield_mod": "護盾量",
+      "tenacity": "韌性",
+      "energy_regeneration": "施法資源回復",
+      "ability_haste": "技能加速",
+      "attack_speed_scaling": "攻速比率"
+    }
+  },
+  "about": {
+    "author": "作者",
+    "currentVersion": "目前版本",
+    "latestVersion": "最新版本",
+    "help": "如果這個程式對您有幫助，請給個⭐\uFE0F！\n<br/>\n這是對我最大的鼓勵！\n",
+    "github": "查看 GitHub 頁面",
+    "credit": "本程式修改自原版，感謝原作者 jasonwu1994：",
+    "disclaimer": "LOL自動接受輔助工具 isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.",
+    "autoCheckUpdate": "啟動時自動檢查更新",
+    "checkUpdate": "檢查更新",
+    "updateNow": "立即更新",
+    "upToDate": "目前已是最新版本",
+    "checkFailed": "檢查更新失敗"
+  },
+  "update": {
+    "title": "有新版本 {{version}}",
+    "later": "稍後再說",
+    "viewRelease": "查看發佈頁面",
+    "install": "立即更新",
+    "downloading": "下載中",
+    "restarting": "下載完成，正在重新啟動以安裝更新...",
+    "failed": "更新失敗，請稍後再試，或到發佈頁面手動下載"
+  },
+  "common": {
+    "teamOne": "藍方",
+    "teamTwo": "紅方",
+    "premade": {
+      "solo": "單排",
+      "duo": "雙排",
+      "trio": "三排",
+      "quad": "四排",
+      "quint": "五排"
+    },
+    "copy_success": "已複製",
+    "copy_failure": "複製失敗"
+  }
+}
