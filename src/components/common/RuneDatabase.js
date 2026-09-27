@@ -8,7 +8,7 @@ const MATCH_CACHE_LIMIT = 60;
 /**
  * 符文設定檔資料庫
  * 設定檔: {_id: 'top:777:80', lane, championId, enemyChampionId, primaryStyleId, subStyleId,
- *          selectedPerkIds: [9 個], source, pinned, gameId, updatedAt}
+ *          selectedPerkIds: [9 個], spellIds: [D, F] (舊版設定檔沒有), source, pinned, gameId, updatedAt}
  * 待補對位的紀錄: {_id: 'pending:<gameId>', ...}，進遊戲時先記下符文，賽後從對戰紀錄補上路線與對位
  * 對戰摘要快取: {_id: 'match:<puuid>:<gameId>', summary}，每場的詳細資料只需要跟用戶端要一次
  */

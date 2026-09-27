@@ -19,7 +19,7 @@ async function fetchGameDetail(gameId) {
 }
 
 /**
- * 近期對戰中有分路的場次，整理成 我的路線/英雄/對位/符文
+ * 近期對戰中有分路的場次，整理成 我的路線/英雄/對位/符文/召喚師技能
  * 對戰列表只有自己的資料，要逐場抓詳細資料才知道對位；整理好的摘要會存進資料庫，
  * 所以每次重新整理只會對用戶端送 1 個列表請求，加上「沒看過的新場次」各 1 個請求
  * @returns {Promise<Array>} summarizeGame 的結果，新的在前
@@ -35,8 +35,10 @@ export async function loadRecentLaneMatches() {
   const summaries = [];
   let hasNewGame = false;
   for (const game of games) {
-    if (cached.has(game.gameId)) {
-      if (cached.get(game.gameId).summary) summaries.push(cached.get(game.gameId).summary);
+    const cachedSummary = cached.get(game.gameId)?.summary;
+    // 舊版快取的摘要沒有召喚師技能，要重抓一次
+    if (cached.has(game.gameId) && (!cachedSummary || cachedSummary.spellIds)) {
+      if (cachedSummary) summaries.push(cachedSummary);
       continue;
     }
     const detail = await fetchGameDetail(game.gameId);

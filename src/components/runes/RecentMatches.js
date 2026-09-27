@@ -16,9 +16,10 @@ function formatTime(timestamp) {
   return `${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-// 對戰紀錄只有主系 4 個 + 副系 2 個，比對時不看屬性碎片
-function isSameMainRunes(profile, match) {
-  return isSameRunes(
+// 對戰紀錄只有主系 4 個 + 副系 2 個，比對時不看屬性碎片；召喚師技能要連 D/F 位置都一樣
+function isSameMatchLoadout(profile, match) {
+  const isSameSpells = (profile.spellIds ?? []).join() === (match.spellIds ?? []).join();
+  return isSameSpells && isSameRunes(
     {...profile, selectedPerkIds: profile.selectedPerkIds.slice(0, 6)},
     {primaryStyleId: match.primaryStyleId, subStyleId: match.subStyleId, selectedPerkIds: match.perkIds});
 }
@@ -83,7 +84,7 @@ function RecentMatches({runeData, profiles, gamePhase, authPort, onStar, onUnsta
 
   const renderStar = (match) => {
     const profile = profileById.get(getProfileId(match.lane, match.championId, match.enemyChampionId));
-    if (profile && isSameMainRunes(profile, match)) {
+    if (profile && isSameMatchLoadout(profile, match)) {
       return (
         <Popconfirm title={t('runes.matches.unstarConfirm')} okText={t('runes.delete')} cancelText={t('runes.cancel')}
                     onConfirm={() => onUnstar(profile)}>
@@ -129,7 +130,8 @@ function RecentMatches({runeData, profiles, gamePhase, authPort, onStar, onUnsta
     {
       title: t('runes.matches.runes'), key: 'runes',
       render: (_, match) => (
-        <RuneSummary runeData={runeData} subStyleId={match.subStyleId} perkIds={match.perkIds} isCompact/>
+        <RuneSummary runeData={runeData} subStyleId={match.subStyleId} perkIds={match.perkIds}
+                     spellIds={match.spellIds} isCompact/>
       )
     },
     {

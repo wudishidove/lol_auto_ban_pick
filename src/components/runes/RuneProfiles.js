@@ -114,7 +114,7 @@ function RuneProfiles(props) {
       </div>
       <div style={{flex: 1}}>
         <RuneSummary runeData={runeData} subStyleId={profile.subStyleId} perkIds={profile.selectedPerkIds}
-                     isCompact/>
+                     spellIds={profile.spellIds} isCompact/>
       </div>
       <Space size={0}>
         <Tooltip title={profile.pinned ? t('runes.pinnedHint') : t('runes.unpinnedHint')}>

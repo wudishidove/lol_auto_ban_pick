@@ -4,15 +4,16 @@ import ApiUtils from "../api/api-utils";
 import RuneDatabase from "../components/common/RuneDatabase";
 import withErrorBoundary from "../components/error/withErrorBoundary";
 import {getLocalPlayer, getMyLane, log} from "./champSelectUtils";
-import {isCompletePerks, profileSource, summarizeGame} from "./runeUtils";
+import {isCompletePerks, isCompleteSpells, profileSource, summarizeGame} from "./runeUtils";
 
 const PENDING_MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000; // 對戰紀錄一直查不到就放棄
 const REMAKE_MAX_DURATION_SECONDS = 300; // 重開的場次不記錄
 
 /**
- * 自動記錄每場的符文
- * 1. 進遊戲時記下目前符文頁(完整 9 個，對戰紀錄裡沒有屬性碎片)，存成待補紀錄
+ * 自動記錄每場的符文與召喚師技能
+ * 1. 進遊戲時記下目前符文頁(完整 9 個，對戰紀錄裡沒有屬性碎片)與召喚師技能，存成待補紀錄
  * 2. 賽後從對戰紀錄補上實際路線與對位英雄，存成設定檔；使用者鎖定(pinned)的設定檔不覆蓋
+ *    召喚師技能以對戰紀錄為準(實際帶進遊戲的)，查不到才用進遊戲時記下的
  */
 const AutoRuneRecordService = (props) => {
   const isResolving = useRef(false);
@@ -29,7 +30,8 @@ const AutoRuneRecordService = (props) => {
   const capture = async () => {
     const session = props.champSelectSession;
     const lane = getMyLane(session);
-    const championId = getLocalPlayer(session)?.championId;
+    const me = getLocalPlayer(session);
+    const championId = me?.championId;
     if (!lane || !championId) return; // 沒有分路的模式不記錄
     const gameflowSession = (await ApiUtils.getGameflowSession()).data;
     const gameId = gameflowSession?.gameData?.gameId;
@@ -44,9 +46,10 @@ const AutoRuneRecordService = (props) => {
       primaryStyleId: page.primaryStyleId,
       subStyleId: page.subStyleId,
       selectedPerkIds: page.selectedPerkIds,
+      spellIds: [me.spell1Id, me.spell2Id],
       createdAt: Date.now(),
     });
-    log(`AutoRuneRecordService captured game ${gameId}, lane ${lane}, champion ${championId}, perks ${JSON.stringify(page.selectedPerkIds)}`);
+    log(`AutoRuneRecordService captured game ${gameId}, lane ${lane}, champion ${championId}, perks ${JSON.stringify(page.selectedPerkIds)}, spells ${me.spell1Id},${me.spell2Id}`);
   };
 
   const resolvePendingRecords = async () => {
@@ -70,6 +73,7 @@ const AutoRuneRecordService = (props) => {
           if (existing?.pinned) {
             log(`AutoRuneRecordService ${existing._id} is pinned, skip`);
           } else {
+            const spellIds = [summary.spellIds, record.spellIds].find(isCompleteSpells);
             const profile = await RuneDatabase.saveProfile({
               lane: summary.lane,
               championId: summary.championId,
@@ -77,6 +81,7 @@ const AutoRuneRecordService = (props) => {
               primaryStyleId: record.primaryStyleId,
               subStyleId: record.subStyleId,
               selectedPerkIds: record.selectedPerkIds,
+              ...(spellIds ? {spellIds} : {}),
               source: profileSource.AUTO,
               pinned: false,
               gameId: record.gameId,

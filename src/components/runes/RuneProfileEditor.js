@@ -1,16 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import {Alert, Button, Checkbox, Col, Divider, Modal, Row, Segmented, Space, Tooltip, Typography} from "antd";
+import {Alert, Button, Checkbox, Col, Divider, Modal, Row, Segmented, Select, Space, Tooltip, Typography} from "antd";
 import {ImportOutlined} from '@ant-design/icons';
 import {useTranslation} from 'react-i18next';
 import ApiUtils from "../../api/api-utils";
 import {lanes} from "../../redux/reducers/ConfigReducer";
-import {ANY_ENEMY, getProfileId, isCompletePerks} from "../../services/runeUtils";
+import {ANY_ENEMY, getProfileId, isCompletePerks, isCompleteSpells} from "../../services/runeUtils";
 import ChampionSelect from "./ChampionSelect";
 import {RuneIcon} from "./RuneIcons";
 
 const {Text} = Typography;
 
 const emptyRunes = {primaryStyleId: null, subStyleId: null, primaryPerks: [0, 0, 0, 0], subPerks: [], shards: [0, 0, 0]};
+const emptySpells = [null, null];
+const spellKeys = ['D', 'F'];
 
 // selectedPerkIds(6 或 9 個) 轉成編輯器狀態，副系要記住每個符文在第幾列
 function toRunesState(runeData, primaryStyleId, subStyleId, perkIds) {
@@ -37,6 +39,7 @@ function toSelectedPerkIds(runes) {
 /**
  * 新增/編輯符文設定檔
  * draft: 預填內容，從對戰紀錄存檔時 selectedPerkIds 只有 6 個，屬性碎片由使用者補選
+ * 召喚師技能可以不選(兩個都空)，要選就兩個都要選
  * existingIds: 已存在的設定檔 id，用來提示存檔會覆蓋
  */
 function RuneProfileEditor({open, draft, notice, existingIds, championOptions, runeData, onSave, onCancel}) {
@@ -45,6 +48,7 @@ function RuneProfileEditor({open, draft, notice, existingIds, championOptions, r
   const [championId, setChampionId] = useState(null);
   const [enemyChampionId, setEnemyChampionId] = useState(ANY_ENEMY);
   const [runes, setRunes] = useState(emptyRunes);
+  const [spellIds, setSpellIds] = useState(emptySpells);
   const [pinned, setPinned] = useState(true);
   const [importError, setImportError] = useState('');
 
@@ -54,6 +58,7 @@ function RuneProfileEditor({open, draft, notice, existingIds, championOptions, r
     setChampionId(draft?.championId ?? null);
     setEnemyChampionId(draft?.enemyChampionId ?? ANY_ENEMY);
     setPinned(draft?.pinned ?? true);
+    setSpellIds(isCompleteSpells(draft?.spellIds) ? draft.spellIds : emptySpells);
     setImportError('');
     setRunes(runeData
       ? toRunesState(runeData, draft?.primaryStyleId, draft?.subStyleId, draft?.selectedPerkIds)
@@ -109,8 +114,20 @@ function RuneProfileEditor({open, draft, notice, existingIds, championOptions, r
     setRunes({...runes, shards});
   };
 
+  // 選到另一格已有的技能時兩格互換，跟用戶端一樣
+  const pickSpell = (slotIndex, id) => {
+    const next = [...spellIds];
+    const otherIndex = 1 - slotIndex;
+    if (id && next[otherIndex] === id) next[otherIndex] = next[slotIndex];
+    next[slotIndex] = id ?? null;
+    setSpellIds(next);
+  };
+
   const selectedPerkIds = toSelectedPerkIds(runes);
-  const isComplete = !!championId && !!runes.primaryStyleId && !!runes.subStyleId && isCompletePerks(selectedPerkIds);
+  const hasSpells = spellIds.some(Boolean);
+  const isSpellsValid = !hasSpells || isCompleteSpells(spellIds);
+  const isComplete = !!championId && !!runes.primaryStyleId && !!runes.subStyleId && isCompletePerks(selectedPerkIds)
+    && isSpellsValid;
   const profileId = championId ? getProfileId(lane, championId, enemyChampionId) : null;
   const willOverwrite = !!profileId && profileId !== draft?._id && (existingIds ?? []).includes(profileId);
 
@@ -122,9 +139,38 @@ function RuneProfileEditor({open, draft, notice, existingIds, championOptions, r
       primaryStyleId: runes.primaryStyleId,
       subStyleId: runes.subStyleId,
       selectedPerkIds,
+      ...(hasSpells ? {spellIds} : {}),
       pinned,
     });
   };
+
+  const spellOptions = (runeData?.classicSpellIds ?? [])
+    .map(id => runeData.spells[id])
+    .filter(Boolean)
+    .map(spell => ({value: spell.id, label: spell.name, spell}));
+
+  const renderSpellSelect = (slotIndex) => (
+    <Space key={slotIndex} size={4}>
+      <Text type="secondary">{spellKeys[slotIndex]}</Text>
+      <Select allowClear style={{width: 120}} size="small" value={spellIds[slotIndex]}
+              placeholder={t('runes.editor.spellPlaceholder')}
+              status={isSpellsValid || spellIds[slotIndex] ? undefined : 'error'}
+              options={spellOptions}
+              optionRender={(option) => (
+                <Space size={6}>
+                  <RuneIcon item={option.data.spell} size={20} isSquare/>
+                  {option.label}
+                </Space>
+              )}
+              labelRender={(option) => (
+                <Space size={6}>
+                  <RuneIcon item={runeData.spells[option.value]} size={16} isSquare/>
+                  {runeData.spells[option.value]?.name ?? option.value}
+                </Space>
+              )}
+              onChange={(value) => pickSpell(slotIndex, value)}/>
+    </Space>
+  );
 
   const renderStyleRow = (styles, selectedId, onPick) => (
     <Space size={10} style={{marginBottom: 6}}>
@@ -197,7 +243,11 @@ function RuneProfileEditor({open, draft, notice, existingIds, championOptions, r
 
         {runeData &&
           <>
-            <Space>
+            <Space wrap size="middle">
+              <Space size={8}>
+                <Text>{t('runes.editor.spells')}</Text>
+                {spellKeys.map((_, slotIndex) => renderSpellSelect(slotIndex))}
+              </Space>
               <Button size="small" icon={<ImportOutlined/>} onClick={importCurrentPage}>
                 {t('runes.editor.importCurrent')}
               </Button>

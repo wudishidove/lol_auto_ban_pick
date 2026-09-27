@@ -22,6 +22,12 @@ export function isCompletePerks(perkIds) {
   return Array.isArray(perkIds) && perkIds.length === PERK_COUNT && perkIds.every(id => Number(id) > 0);
 }
 
+// 兩個召喚師技能 [D, F]，順序代表按鍵位置
+export function isCompleteSpells(spellIds) {
+  return Array.isArray(spellIds) && spellIds.length === 2 && spellIds.every(id => Number(id) > 0)
+    && spellIds[0] !== spellIds[1];
+}
+
 // 副系的兩個符文用戶端會依所在列重新排序，所以不比順序
 export function isSameRunes(a, b) {
   if (!a || !b) return false;
@@ -46,7 +52,7 @@ export function findProfile(profiles, lane, championId, enemyChampionId) {
 }
 
 /**
- * 把一場對戰紀錄整理成 我的路線/英雄/對位/符文，不是分路模式或資料不完整時回傳 null
+ * 把一場對戰紀錄整理成 我的路線/英雄/對位/符文/召喚師技能，不是分路模式或資料不完整時回傳 null
  * 註: 對戰紀錄只有 6 個符文，沒有屬性碎片；timeline.lane/role 不可信，路線一律用 participants 順序判斷
  */
 export function summarizeGame(game, puuid) {
@@ -73,6 +79,7 @@ export function summarizeGame(game, puuid) {
     primaryStyleId: stats.perkPrimaryStyle,
     subStyleId: stats.perkSubStyle,
     perkIds: [stats.perk0, stats.perk1, stats.perk2, stats.perk3, stats.perk4, stats.perk5],
+    spellIds: [me.spell1Id, me.spell2Id],
   };
 }
 

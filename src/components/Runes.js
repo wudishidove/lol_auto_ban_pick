@@ -71,6 +71,7 @@ function Runes(props) {
         primaryStyleId: match.primaryStyleId,
         subStyleId: match.subStyleId,
         selectedPerkIds: [...match.perkIds, ...shards],
+        spellIds: match.spellIds,
         gameId: match.gameId,
         pinned: true,
       },
