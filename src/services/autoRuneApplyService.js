@@ -5,7 +5,9 @@ import RuneDatabase from "../components/common/RuneDatabase";
 import withErrorBoundary from "../components/error/withErrorBoundary";
 import {getLocalPlayer, getMyLane, log} from "./champSelectUtils";
 import {findProfile, inferLaneOpponent, isSameRunes} from "./runeUtils";
-import {applyProfileToClient} from "./runeApplyUtils";
+import {applyProfileToClient, isManagedPage, restoreManagedPage} from "./runeApplyUtils";
+
+const {ipcRenderer} = window.require('electron');
 
 // 英雄的推薦位置幾乎不會變，整個程式執行期間快取一份
 let recommendedPositionsCache = null;
@@ -42,6 +44,33 @@ const AutoRuneApplyService = (props) => {
   const applied = useRef(null); // 本場自動套用過的設定檔，例: {gameId, profile}
   const lastSignature = useRef(''); // 上次處理過的選角狀態，積分場的選角事件很密集，沒變就不重算
   const [retryTick, setRetryTick] = useState(0);
+  const latestProps = useRef(props);
+  latestProps.current = props;
+  const managedPage = useRef(null); // 本場本程式符文頁最後的內容(含使用者在用戶端的微調)，例: {gameId, page}
+  const restoredGameId = useRef(null);
+
+  // 用戶端在選角最後幾秒會把推薦符文原地寫進本程式的暫時頁(頁 id 不變、頁名變成「英雄 - 基石」)
+  // 手動或自動套用的都會被蓋掉，偵測到就改回被蓋掉前的內容；每場只改回一次，避免跟用戶端來回搶
+  // 使用者自己換到其他頁時頁 id 會不同，不處理
+  useEffect(() => {
+    const handleCurrentPage = (event, page) => {
+      const {gamePhase, champSelectSession} = latestProps.current;
+      const gameId = champSelectSession?.gameId;
+      if (gamePhase !== 'ChampSelect' || !gameId || !page?.id) return;
+      if (isManagedPage(page)) {
+        managedPage.current = {gameId, page};
+        return;
+      }
+      const last = managedPage.current;
+      if (last?.gameId !== gameId || last.page.id !== page.id || restoredGameId.current === gameId) return;
+      restoredGameId.current = gameId;
+      log(`AutoRuneApplyService page ${page.id} overwritten by "${page.name}" ${JSON.stringify(page.selectedPerkIds)}, restore it`);
+      restoreManagedPage(last.page)
+        .catch(error => log(`restoreManagedPage failed: ${error?.response?.status} ${JSON.stringify(error?.response?.data ?? error?.message)}`));
+    };
+    ipcRenderer.on('rune-current-page', handleCurrentPage);
+    return () => ipcRenderer.removeListener('rune-current-page', handleCurrentPage);
+  }, []);
 
   useEffect(() => {
     if (props.gamePhase !== 'ChampSelect') {

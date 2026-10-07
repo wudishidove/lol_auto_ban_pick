@@ -367,6 +367,11 @@ class ApiUtils {
     return axios.patch(`${ApiUtils.getApiBaseUrl()}/lol-champ-select/v1/session/actions/${actionId}`, payload)
   }
 
+  // payload 例: {spell1Id: 4, spell2Id: 14}，只有選角中能用
+  static patchChampSelectMySelection(payload) {
+    return axios.patch(`${ApiUtils.getApiBaseUrl()}/lol-champ-select/v1/session/my-selection`, payload)
+  }
+
   static getChampSelectTrades() {
     return axios.get(`${ApiUtils.getApiBaseUrl()}/lol-champ-select/v1/session/trades`)
   }

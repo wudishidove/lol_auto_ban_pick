@@ -321,6 +321,11 @@ function handleOnLoginSession(payload) {
     BrowserWindow.fromId(mainWinId).webContents.send('champ-select-session', payload.data);
   }
 
+  // 用戶端會在選角最後幾秒把推薦符文寫進暫時頁，蓋掉本程式套用的符文，要讓 react 知道才能套回去
+  if (payload.uri === '/lol-perks/v1/currentpage' && payload.eventType === 'Update' && payload.data) {
+    BrowserWindow.fromId(mainWinId).webContents.send('rune-current-page', payload.data);
+  }
+
   if (payload.uri === '/lol-lobby/v2/comms/members' && payload.eventType !== 'Delete') {
     logger.info("lol-lobby/v2/comms/members ", JSON.stringify(payload, null, 2))
     BrowserWindow.fromId(mainWinId).webContents.send('lobby-comms-members', payload.data);
