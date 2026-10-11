@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {Alert, Button, Card, Empty, Popconfirm, Segmented, Space, Switch, Tag, Tooltip, Typography} from "antd";
 import {
-  CheckOutlined, DeleteOutlined, EditOutlined, LockFilled, PlusOutlined, QuestionCircleOutlined,
-  ThunderboltOutlined, UnlockOutlined
+  CheckOutlined, DeleteOutlined, DownOutlined, EditOutlined, LockFilled, PlusOutlined, QuestionCircleOutlined,
+  ThunderboltOutlined, UnlockOutlined, UpOutlined
 } from '@ant-design/icons';
 import {useTranslation} from 'react-i18next';
 import ApiUtils from "../../api/api-utils";
@@ -21,6 +21,24 @@ function RuneProfiles(props) {
   const {config, profiles, runeData, championOptions, runeApplyState} = props;
   const [laneFilter, setLaneFilter] = useState(ALL_LANES);
   const [championFilter, setChampionFilter] = useState(null);
+  // 預設每組只顯示通用，使用者點開的組才列出全部對位
+  const [expandedGroups, setExpandedGroups] = useState(() => new Set());
+
+  const toggleGroup = (key) => setExpandedGroups(prev => {
+    const next = new Set(prev);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    return next;
+  });
+
+  // 折疊時要顯示的列: 通用，選角中再加上目前對位與正在套用的那一列
+  const isVisibleWhenCollapsed = (profile) => {
+    if (profile.enemyChampionId === ANY_ENEMY) return true;
+    if (!runeApplyState?.gameId) return false;
+    if (profile._id === runeApplyState.profileId) return true;
+    return profile.championId === runeApplyState.championId && profile.lane === runeApplyState.lane
+      && profile.enemyChampionId === runeApplyState.enemyChampionId;
+  };
 
   // 視窗不大，說明收進問號提示，兩個開關排同一列
   const renderSwitch = (id, label, hint, configKey) => (
@@ -179,22 +197,34 @@ function RuneProfiles(props) {
             <Button onClick={props.onGotoMatches}>{t('runes.gotoMatches')}</Button>}
         </Empty>}
 
-      {sortedGroups.map(list => (
-        <Card key={`${list[0].championId}:${list[0].lane}`} size="small"
-              title={
-                <Space>
-                  <ChampionImage width={30} height={30} championId={list[0].championId}/>
-                  <span style={{fontSize: 16}}>{ApiUtils.getChampionNameById(list[0].championId)}</span>
-                  <Tag color="geekblue">{t(`banPick.lanes.${list[0].lane}`)}</Tag>
-                </Space>
-              }
-              extra={
-                <Button type="link" size="small" icon={<PlusOutlined/>}
-                        onClick={() => props.onAddFor(list[0])}>{t('runes.addMatchup')}</Button>
-              }>
-          {list.map(renderProfileRow)}
-        </Card>
-      ))}
+      {sortedGroups.map(list => {
+        const key = `${list[0].championId}:${list[0].lane}`;
+        const expanded = expandedGroups.has(key);
+        const visible = expanded ? list : list.filter(isVisibleWhenCollapsed);
+        const hiddenCount = list.length - list.filter(isVisibleWhenCollapsed).length;
+        return (
+          <Card key={key} size="small"
+                title={
+                  <Space>
+                    <ChampionImage width={30} height={30} championId={list[0].championId}/>
+                    <span style={{fontSize: 16}}>{ApiUtils.getChampionNameById(list[0].championId)}</span>
+                    <Tag color="geekblue">{t(`banPick.lanes.${list[0].lane}`)}</Tag>
+                  </Space>
+                }
+                extra={
+                  <Button type="link" size="small" icon={<PlusOutlined/>}
+                          onClick={() => props.onAddFor(list[0])}>{t('runes.addMatchup')}</Button>
+                }>
+            {visible.map(renderProfileRow)}
+            {hiddenCount > 0 &&
+              <Button type="link" size="small" style={{paddingInline: 0}}
+                      icon={expanded ? <UpOutlined/> : <DownOutlined/>}
+                      onClick={() => toggleGroup(key)}>
+                {expanded ? t('runes.hideMatchups') : t('runes.showMatchups', {count: hiddenCount})}
+              </Button>}
+          </Card>
+        );
+      })}
     </Space>
   );
 }

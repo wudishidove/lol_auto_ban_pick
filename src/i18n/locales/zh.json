@@ -115,6 +115,8 @@
     "filterChampion": "篩選英雄",
     "add": "新增設定檔",
     "addMatchup": "新增對位",
+    "showMatchups": "展開其他 {{count}} 個對位",
+    "hideMatchups": "收合對位",
     "emptyHint": "還沒有符文設定檔。可以從近期對戰按星號存檔、手動新增，或開著自動記錄打幾場",
     "emptyFiltered": "沒有符合篩選條件的設定檔",
     "gotoMatches": "從近期對戰挑選",

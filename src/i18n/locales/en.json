@@ -115,6 +115,8 @@
     "filterChampion": "Filter champion",
     "add": "New profile",
     "addMatchup": "Add matchup",
+    "showMatchups": "Show {{count}} more matchups",
+    "hideMatchups": "Collapse matchups",
     "emptyHint": "No rune profiles yet. Star a recent match, add one manually, or play a few games with auto record on",
     "emptyFiltered": "No profiles match the filter",
     "gotoMatches": "Pick from recent matches",
