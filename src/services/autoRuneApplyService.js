@@ -12,6 +12,21 @@ const {ipcRenderer} = window.require('electron');
 // 用戶端在確認階段(FINALIZATION)最後幾秒才會自動寫入推薦符文(實測約剩 6 秒)，這段時間內的變動才當成被用戶端蓋掉
 const CLIENT_OVERWRITE_WINDOW_MS = 10 * 1000;
 
+// 上一場的暫時頁在賽後會被用戶端清掉，剛進選角時常常沒有使用中的頁(用戶端顯示「-」，API 回 404)，當成 null
+async function getCurrentPageOrNull() {
+  try {
+    return (await ApiUtils.getCurrentRunePage()).data ?? null;
+  } catch (error) {
+    if (error?.response?.status === 404) return null;
+    throw error;
+  }
+}
+
+// 兩邊都沒有使用中的頁也算一樣
+function isSamePage(a, b) {
+  return (!a && !b) || isSameRunes(a, b);
+}
+
 // 英雄的推薦位置幾乎不會變，整個程式執行期間快取一份
 let recommendedPositionsCache = null;
 const defaultPositionCache = {};
@@ -161,7 +176,7 @@ const AutoRuneApplyService = (props) => {
         let tracked = applied.current?.gameId === session.gameId ? applied.current : null;
         if (tracked && (!profile || tracked.profileId === profile._id)) return;
         const spellIds = [me.spell1Id, me.spell2Id];
-        const currentPage = (await ApiUtils.getCurrentRunePage()).data;
+        const currentPage = await getCurrentPageOrNull();
         if (!tracked) {
           // 鎖角後第一次處理，記下當下的內容當基準
           tracked = {gameId: session.gameId, profileId: null, runes: currentPage, spellIds};
@@ -169,7 +184,7 @@ const AutoRuneApplyService = (props) => {
         }
         if (!profile) return;
         // 鎖角後使用者自己在用戶端改過的部分就不再覆蓋
-        const isRunesKept = !!tracked.isRunesKept || !isSameRunes(currentPage, tracked.runes);
+        const isRunesKept = !!tracked.isRunesKept || !isSamePage(currentPage, tracked.runes);
         const isSpellsKept = !!tracked.isSpellsKept || !isSameSpells(spellIds, tracked.spellIds);
         if (isRunesKept && isSpellsKept) {
           log('AutoRuneApplyService runes and spells changed by user, stop auto apply for this game');
