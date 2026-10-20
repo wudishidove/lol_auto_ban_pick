@@ -86,6 +86,35 @@ export async function restoreManagedPage(page) {
   return response.data;
 }
 
+// 推薦符文整個程式執行期間幾乎不會變，依 英雄+位置 快取，失敗就清掉下次重抓
+const recommendedRunesCache = new Map();
+
+/**
+ * 英雄的官方推薦符文，用來分辨符文頁是被用戶端自動寫成推薦頁，還是使用者自己微調過
+ * 用戶端最後幾秒寫入的是「預設位置」的推薦頁(實測犽宿上路寫的是中路那組)，所以分路與預設位置的都要
+ * @param {number} championId
+ * @param {string} lane 'top' | 'jungle' | ...，沒有分路時只抓預設位置的
+ * @returns {Promise<Object[]>} [{primaryStyleId, subStyleId, selectedPerkIds}]
+ */
+export function getRecommendedRunes(championId, lane) {
+  const positions = [...new Set([lane?.toUpperCase(), 'NONE'].filter(Boolean))];
+  const key = `${championId}:${positions.join(',')}`;
+  if (!recommendedRunesCache.has(key)) {
+    const request = Promise.all(positions.map(position => ApiUtils.getRecommendedPages(championId, position)))
+      .then(responses => responses.flatMap(response => response.data ?? []).map(page => ({
+        primaryStyleId: page.primaryPerkStyleId,
+        subStyleId: page.secondaryPerkStyleId,
+        selectedPerkIds: (page.perks ?? []).map(perk => perk.id),
+      })))
+      .catch(error => {
+        recommendedRunesCache.delete(key);
+        throw error;
+      });
+    recommendedRunesCache.set(key, request);
+  }
+  return recommendedRunesCache.get(key);
+}
+
 // 顯示給使用者看的錯誤原因，例: "400 Invalid perk"
 export function describeApplyError(error) {
   const status = error?.response?.status;

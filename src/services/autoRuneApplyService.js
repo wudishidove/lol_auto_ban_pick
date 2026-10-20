@@ -5,7 +5,7 @@ import RuneDatabase from "../components/common/RuneDatabase";
 import withErrorBoundary from "../components/error/withErrorBoundary";
 import {getLocalPlayer, getMyLane, log} from "./champSelectUtils";
 import {findProfile, inferLaneOpponent, isSameRunes, isSameSpells} from "./runeUtils";
-import {applyProfileToClient, isManagedPage, restoreManagedPage} from "./runeApplyUtils";
+import {applyProfileToClient, getRecommendedRunes, isManagedPage, restoreManagedPage} from "./runeApplyUtils";
 
 const {ipcRenderer} = window.require('electron');
 
@@ -57,33 +57,53 @@ const AutoRuneApplyService = (props) => {
   const finalizationEndsAt = useRef(null); // 確認階段預計結束的時間(本機時間)，不在確認階段時為 null
 
   useEffect(() => {
-    const timer = props.champSelectSession?.timer;
+    const session = props.champSelectSession;
+    const timer = session?.timer;
     finalizationEndsAt.current = timer?.phase === 'FINALIZATION'
       ? Date.now() + (timer.adjustedTimeLeftInPhase ?? 0) : null;
+    // 進確認階段就先抓好推薦符文，被蓋掉時才能馬上比對
+    const championId = getLocalPlayer(session)?.championId;
+    if (timer?.phase === 'FINALIZATION' && championId) {
+      getRecommendedRunes(championId, getMyLane(session))
+        .catch(error => log(`getRecommendedRunes failed: ${error?.response?.status} ${error?.message}`));
+    }
   }, [props.champSelectSession]);
 
   // 用戶端在確認階段最後幾秒會把推薦符文原地寫進本程式的暫時頁(頁 id 不變、頁名變成「英雄 - 基石」)
   // 手動或自動套用的都會被蓋掉，偵測到就改回被蓋掉前的內容；每場只改回一次，避免跟用戶端來回搶
   // 在這之前同一頁的變動(使用者自己微調、在用戶端選推薦頁)都算使用者的，記下來當要改回的內容
+  // 最後幾秒的變動也只有內容跟某個官方推薦頁完全一樣才算被蓋掉，有任何不同就是使用者自己微調的
   // 使用者自己換到其他頁時頁 id 會不同，不處理
   useEffect(() => {
-    const handleCurrentPage = (event, page) => {
+    const handleCurrentPage = async (event, page) => {
       const {gamePhase, champSelectSession} = latestProps.current;
       const gameId = champSelectSession?.gameId;
       if (gamePhase !== 'ChampSelect' || !gameId || !page?.id) return;
       const last = managedPage.current?.gameId === gameId ? managedPage.current : null;
       const isOwnPage = isManagedPage(page) || last?.page.id === page.id;
-      if (!isOwnPage) return;
       const isClientOverwriteWindow = finalizationEndsAt.current !== null
         && finalizationEndsAt.current - Date.now() <= CLIENT_OVERWRITE_WINDOW_MS;
+      if (!isOwnPage) {
+        // 使用者換到自己的其他頁，最後幾秒就不改回本程式的頁，免得把使用者換回來
+        if (last && !isClientOverwriteWindow) managedPage.current = {...last, isAway: true};
+        return;
+      }
       if (!last || !isClientOverwriteWindow) {
         managedPage.current = {gameId, page};
         return;
       }
-      if (last.page.id !== page.id || isSameRunes(page, last.page) || restoredGameId.current === gameId) return;
+      if (last.isAway || last.page.id !== page.id || isSameRunes(page, last.page) || restoredGameId.current === gameId) return;
+      // 抓不到推薦符文就沿用舊做法，當成被蓋掉
+      const recommended = await getRecommendedRunes(getLocalPlayer(champSelectSession)?.championId, getMyLane(champSelectSession))
+        .catch(() => null);
+      if (recommended && !recommended.some(runes => isSameRunes(page, runes))) {
+        managedPage.current = {gameId, page};
+        return;
+      }
+      if (restoredGameId.current === gameId) return; // 等推薦符文的期間已經改回過
       restoredGameId.current = gameId;
       log(`AutoRuneApplyService page ${page.id} overwritten by "${page.name}" ${JSON.stringify(page.selectedPerkIds)}, restore it`);
-      restoreManagedPage(last.page)
+      restoreManagedPage(managedPage.current.page)
         .catch(error => log(`restoreManagedPage failed: ${error?.response?.status} ${JSON.stringify(error?.response?.data ?? error?.message)}`));
     };
     ipcRenderer.on('rune-current-page', handleCurrentPage);

@@ -406,6 +406,12 @@ class ApiUtils {
     return axios.get(`${ApiUtils.getApiBaseUrl()}/lol-perks/v1/recommended-champion-positions`)
   }
 
+  // 用戶端的官方推薦符文頁，position 例: 'TOP'，給 NONE 時回傳英雄預設位置的
+  static getRecommendedPages(championId, position) {
+    return axios.get(
+      `${ApiUtils.getApiBaseUrl()}/lol-perks/v1/recommended-pages/champion/${championId}/position/${position}/map/11`);
+  }
+
   // 英雄最主要的位置(例: 'TOP')，position 給 NONE 時用戶端會回傳預設位置的推薦符文
   static async getChampionDefaultPosition(championId) {
     const response = await axios.get(
