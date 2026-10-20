@@ -13,6 +13,7 @@ const REMAKE_MAX_DURATION_SECONDS = 300; // 重開的場次不記錄
  * 自動記錄每場的符文與召喚師技能
  * 1. 進遊戲時記下目前符文頁(完整 9 個，對戰紀錄裡沒有屬性碎片)與召喚師技能，存成待補紀錄
  * 2. 賽後從對戰紀錄補上實際路線與對位英雄，存成設定檔；使用者鎖定(pinned)的設定檔不覆蓋
+ *    這隻英雄在這路還沒有通用設定檔時，順便存一份通用的
  *    召喚師技能以對戰紀錄為準(實際帶進遊戲的)，查不到才用進遊戲時記下的
  */
 const AutoRuneRecordService = (props) => {
@@ -87,6 +88,8 @@ const AutoRuneRecordService = (props) => {
               gameId: record.gameId,
             });
             log(`AutoRuneRecordService saved ${profile._id} from game ${record.gameId}`);
+            const generic = await RuneDatabase.saveGenericIfMissing(profile);
+            if (generic) log(`AutoRuneRecordService also saved generic ${generic._id}`);
           }
         }
         await RuneDatabase.deletePendingRecord(record.gameId);

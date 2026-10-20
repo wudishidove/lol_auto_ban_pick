@@ -4,7 +4,7 @@ import ApiUtils from "../api/api-utils";
 import RuneDatabase from "../components/common/RuneDatabase";
 import withErrorBoundary from "../components/error/withErrorBoundary";
 import {getLocalPlayer, getMyLane, log} from "./champSelectUtils";
-import {findProfile, inferLaneOpponent, isSameRunes} from "./runeUtils";
+import {findProfile, inferLaneOpponent, isSameRunes, isSameSpells} from "./runeUtils";
 import {applyProfileToClient, isManagedPage, restoreManagedPage} from "./runeApplyUtils";
 
 const {ipcRenderer} = window.require('electron');
@@ -37,11 +37,14 @@ async function getDefaultPositions(championIds, recommendedPositions) {
  * 選角時推測對位英雄並套用符文設定檔
  * 推測結果一律寫進 redux 供「符文」分頁顯示，只有開啟自動套用時才會真的改用戶端符文
  * 敵方英雄是陸續亮出來的，推測的對位改變導致符合的設定檔不同時會重新套用
+ * 鎖角後使用者自己改過的部分(符文頁、召喚師技能分開算)，之後重新套用時就不再覆蓋
  */
 const AutoRuneApplyService = (props) => {
   const isWorking = useRef(false);
   const isEventSkipped = useRef(false); // 處理期間有選角事件被跳過
-  const applied = useRef(null); // 本場自動套用過的設定檔，例: {gameId, profile}
+  // 本場鎖角後符文頁與召喚師技能應有的內容(鎖角當下的，或本程式套用上去的)，跟它不同就是使用者自己改的
+  // 例: {gameId, profileId, runes, spellIds, isRunesKept, isSpellsKept}，isXxxKept 代表使用者改過、不再覆蓋
+  const applied = useRef(null);
   const lastSignature = useRef(''); // 上次處理過的選角狀態，積分場的選角事件很密集，沒變就不重算
   const [retryTick, setRetryTick] = useState(0);
   const latestProps = useRef(props);
@@ -84,7 +87,8 @@ const AutoRuneApplyService = (props) => {
     if (props.gamePhase !== 'ChampSelect') return;
     const session = props.champSelectSession;
     const lane = getMyLane(session);
-    const championId = getLocalPlayer(session)?.championId;
+    const me = getLocalPlayer(session);
+    const championId = me?.championId;
     if (!lane || !championId) return; // 沒有分路的模式沒有對位可言
     if (isWorking.current) {
       isEventSkipped.current = true;
@@ -119,22 +123,36 @@ const AutoRuneApplyService = (props) => {
         // 套用失敗過(例如符文已改版失效)也不再重試，避免每個選角事件都去寫符文頁
         if (!props.isAutoApplyRunes || !isLocked || previous.isManual || previous.error) return;
         const profile = findProfile(await RuneDatabase.getProfiles(), lane, championId, enemyChampionId);
-        if (!profile) return;
-        if (applied.current?.gameId === session.gameId) {
-          if (applied.current.profile._id === profile._id) return;
-          // 套用後使用者自己在用戶端改過符文，就不再覆蓋
-          const currentPage = (await ApiUtils.getCurrentRunePage()).data;
-          if (!isSameRunes(currentPage, applied.current.profile)) {
-            log('AutoRuneApplyService rune page changed by user, stop auto apply for this game');
-            isStateChanged = true;
-            props.changeRuneApplyState({...state, isManual: true});
-            return;
-          }
+        let tracked = applied.current?.gameId === session.gameId ? applied.current : null;
+        if (tracked && (!profile || tracked.profileId === profile._id)) return;
+        const spellIds = [me.spell1Id, me.spell2Id];
+        const currentPage = (await ApiUtils.getCurrentRunePage()).data;
+        if (!tracked) {
+          // 鎖角後第一次處理，記下當下的內容當基準
+          tracked = {gameId: session.gameId, profileId: null, runes: currentPage, spellIds};
+          applied.current = tracked;
         }
-        log(`AutoRuneApplyService lane ${lane}, champion ${championId}, enemies ${JSON.stringify(enemyChampionIds)}, opponent ${enemyChampionId}, apply ${profile._id}`);
-        await applyProfileToClient(profile);
+        if (!profile) return;
+        // 鎖角後使用者自己在用戶端改過的部分就不再覆蓋
+        const isRunesKept = !!tracked.isRunesKept || !isSameRunes(currentPage, tracked.runes);
+        const isSpellsKept = !!tracked.isSpellsKept || !isSameSpells(spellIds, tracked.spellIds);
+        if (isRunesKept && isSpellsKept) {
+          log('AutoRuneApplyService runes and spells changed by user, stop auto apply for this game');
+          isStateChanged = true;
+          props.changeRuneApplyState({...state, isManual: true});
+          return;
+        }
+        log(`AutoRuneApplyService lane ${lane}, champion ${championId}, enemies ${JSON.stringify(enemyChampionIds)}, opponent ${enemyChampionId}, apply ${profile._id}${isRunesKept ? ' (keep user runes)' : ''}${isSpellsKept ? ' (keep user spells)' : ''}`);
+        const {isSpellsApplied} = await applyProfileToClient(profile, {runes: !isRunesKept, spells: !isSpellsKept});
         isStateChanged = true;
-        applied.current = {gameId: session.gameId, profile};
+        applied.current = {
+          ...tracked,
+          profileId: profile._id,
+          runes: isRunesKept ? tracked.runes : profile,
+          spellIds: isSpellsApplied ? profile.spellIds : tracked.spellIds,
+          isRunesKept,
+          isSpellsKept,
+        };
         props.changeRuneApplyState({...state, profileId: profile._id, error: null});
       } catch (error) {
         log(`AutoRuneApplyService failed: ${error?.response?.status} ${JSON.stringify(error?.response?.data ?? error?.message)}`);

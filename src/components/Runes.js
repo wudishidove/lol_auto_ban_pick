@@ -37,6 +37,8 @@ function Runes(props) {
   const saveProfile = async (values) => {
     const {draft, source} = editor;
     const saved = await RuneDatabase.saveProfile({...values, source, gameId: draft?.gameId});
+    // 要在刪舊檔之前補通用檔，把通用檔改成對位時才不會馬上又補回一份
+    await RuneDatabase.saveGenericIfMissing(saved);
     // 編輯時改了 英雄/路線/對位 等於搬到新的位置，舊的那份要刪掉
     if (draft?._id && draft._id !== saved._id) await RuneDatabase.deleteProfile(draft._id);
     setEditor(null);

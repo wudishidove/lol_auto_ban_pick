@@ -28,6 +28,12 @@ export function isCompleteSpells(spellIds) {
     && spellIds[0] !== spellIds[1];
 }
 
+// 順序不同也算不同(D、F 互換)
+export function isSameSpells(a, b) {
+  return Array.isArray(a) && Array.isArray(b) && a.length === b.length
+    && a.every((id, index) => Number(id) === Number(b[index]));
+}
+
 // 副系的兩個符文用戶端會依所在列重新排序，所以不比順序
 export function isSameRunes(a, b) {
   if (!a || !b) return false;

@@ -19,9 +19,20 @@ function getPageName(profile) {
  * 暫時頁不會互相頂掉，每 POST 一次就多一頁，所以已經有自己建的暫時頁時改用 PUT 原地改寫
  * (以上行為參考 wnzzer/rank-analysis 2026-09-15 的實機驗證；全程不 DELETE 任何頁)
  * @param {Object} profile 符文設定檔
- * @returns {Promise<Object>} 寫入後的符文頁
+ * @param {Object} [options] {runes: false} 不改符文頁、{spells: false} 不改召喚師技能
+ * @returns {Promise<{isSpellsApplied: boolean}>} 召喚師技能是否有換上
  */
-export async function applyProfileToClient(profile) {
+export async function applyProfileToClient(profile, {runes = true, spells = true} = {}) {
+  try {
+    if (runes) await applyRunePage(profile);
+    return {isSpellsApplied: spells && await applySpells(profile)};
+  } catch (error) {
+    log(`applyProfileToClient failed: ${error?.response?.status} ${JSON.stringify(error?.response?.data ?? error?.message)}`);
+    throw error;
+  }
+}
+
+async function applyRunePage(profile) {
   const payload = {
     name: getPageName(profile),
     isTemporary: true,
@@ -30,31 +41,26 @@ export async function applyProfileToClient(profile) {
     selectedPerkIds: profile.selectedPerkIds,
     current: true,
   };
-  try {
-    const pages = (await ApiUtils.getRunePages()).data ?? [];
-    const ownPage = pages.find(isManagedPage);
-    const response = ownPage
-      ? await ApiUtils.putRunePage(ownPage.id, payload)
-      : await ApiUtils.postRunePage(payload);
-    log(`applyProfileToClient ${ownPage ? `updated page ${ownPage.id}` : `created page ${response.data?.id}`} with ${profile._id}`);
-    await applySpells(profile);
-    return response.data;
-  } catch (error) {
-    log(`applyProfileToClient failed: ${error?.response?.status} ${JSON.stringify(error?.response?.data ?? error?.message)}`);
-    throw error;
-  }
+  const pages = (await ApiUtils.getRunePages()).data ?? [];
+  const ownPage = pages.find(isManagedPage);
+  const response = ownPage
+    ? await ApiUtils.putRunePage(ownPage.id, payload)
+    : await ApiUtils.postRunePage(payload);
+  log(`applyRunePage ${ownPage ? `updated page ${ownPage.id}` : `created page ${response.data?.id}`} with ${profile._id}`);
 }
 
 // 設定檔有記錄召喚師技能就一起換上；舊版設定檔沒有就不動
 // 不在選角中(例如賽前在「符文」分頁手動套用)會失敗，符文已經寫好了，只記 log 不算套用失敗
 async function applySpells(profile) {
-  if (!isCompleteSpells(profile.spellIds)) return;
+  if (!isCompleteSpells(profile.spellIds)) return false;
   const [spell1Id, spell2Id] = profile.spellIds.map(Number);
   try {
     await ApiUtils.patchChampSelectMySelection({spell1Id, spell2Id});
     log(`applySpells set spells ${spell1Id},${spell2Id} with ${profile._id}`);
+    return true;
   } catch (error) {
     log(`applySpells failed: ${error?.response?.status} ${JSON.stringify(error?.response?.data ?? error?.message)}`);
+    return false;
   }
 }
 

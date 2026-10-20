@@ -1,5 +1,5 @@
 import PouchDB from 'pouchdb';
-import {getProfileId} from "../../services/runeUtils";
+import {ANY_ENEMY, getProfileId} from "../../services/runeUtils";
 
 const PENDING_PREFIX = 'pending:';
 const MATCH_PREFIX = 'match:';
@@ -60,6 +60,13 @@ class RuneDatabase {
     if (existing) doc._rev = existing._rev;
     await this.getDB().put(doc);
     return doc;
+  }
+
+  // 存對位設定檔時，這隻英雄在這路還沒有通用設定檔，就用同一份符文補存一份通用的
+  static async saveGenericIfMissing(profile) {
+    if (!(Number(profile.enemyChampionId) > 0)) return null;
+    if (await this.getProfile(profile.lane, profile.championId, ANY_ENEMY)) return null;
+    return this.saveProfile({...profile, enemyChampionId: ANY_ENEMY, pinned: false});
   }
 
   static async deleteProfile(id) {
