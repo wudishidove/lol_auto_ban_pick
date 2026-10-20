@@ -9,6 +9,9 @@ import {applyProfileToClient, isManagedPage, restoreManagedPage} from "./runeApp
 
 const {ipcRenderer} = window.require('electron');
 
+// 用戶端在確認階段(FINALIZATION)最後幾秒才會自動寫入推薦符文(實測約剩 6 秒)，這段時間內的變動才當成被用戶端蓋掉
+const CLIENT_OVERWRITE_WINDOW_MS = 10 * 1000;
+
 // 英雄的推薦位置幾乎不會變，整個程式執行期間快取一份
 let recommendedPositionsCache = null;
 const defaultPositionCache = {};
@@ -51,21 +54,33 @@ const AutoRuneApplyService = (props) => {
   latestProps.current = props;
   const managedPage = useRef(null); // 本場本程式符文頁最後的內容(含使用者在用戶端的微調)，例: {gameId, page}
   const restoredGameId = useRef(null);
+  const finalizationEndsAt = useRef(null); // 確認階段預計結束的時間(本機時間)，不在確認階段時為 null
 
-  // 用戶端在選角最後幾秒會把推薦符文原地寫進本程式的暫時頁(頁 id 不變、頁名變成「英雄 - 基石」)
+  useEffect(() => {
+    const timer = props.champSelectSession?.timer;
+    finalizationEndsAt.current = timer?.phase === 'FINALIZATION'
+      ? Date.now() + (timer.adjustedTimeLeftInPhase ?? 0) : null;
+  }, [props.champSelectSession]);
+
+  // 用戶端在確認階段最後幾秒會把推薦符文原地寫進本程式的暫時頁(頁 id 不變、頁名變成「英雄 - 基石」)
   // 手動或自動套用的都會被蓋掉，偵測到就改回被蓋掉前的內容；每場只改回一次，避免跟用戶端來回搶
+  // 在這之前同一頁的變動(使用者自己微調、在用戶端選推薦頁)都算使用者的，記下來當要改回的內容
   // 使用者自己換到其他頁時頁 id 會不同，不處理
   useEffect(() => {
     const handleCurrentPage = (event, page) => {
       const {gamePhase, champSelectSession} = latestProps.current;
       const gameId = champSelectSession?.gameId;
       if (gamePhase !== 'ChampSelect' || !gameId || !page?.id) return;
-      if (isManagedPage(page)) {
+      const last = managedPage.current?.gameId === gameId ? managedPage.current : null;
+      const isOwnPage = isManagedPage(page) || last?.page.id === page.id;
+      if (!isOwnPage) return;
+      const isClientOverwriteWindow = finalizationEndsAt.current !== null
+        && finalizationEndsAt.current - Date.now() <= CLIENT_OVERWRITE_WINDOW_MS;
+      if (!last || !isClientOverwriteWindow) {
         managedPage.current = {gameId, page};
         return;
       }
-      const last = managedPage.current;
-      if (last?.gameId !== gameId || last.page.id !== page.id || restoredGameId.current === gameId) return;
+      if (last.page.id !== page.id || isSameRunes(page, last.page) || restoredGameId.current === gameId) return;
       restoredGameId.current = gameId;
       log(`AutoRuneApplyService page ${page.id} overwritten by "${page.name}" ${JSON.stringify(page.selectedPerkIds)}, restore it`);
       restoreManagedPage(last.page)
