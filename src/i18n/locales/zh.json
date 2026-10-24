@@ -221,7 +221,7 @@
     "author": "作者",
     "currentVersion": "目前版本",
     "latestVersion": "最新版本",
-    "help": "如果這個程式對您有幫助，請給個⭐\uFE0F！\n<br/>\n這是對我最大的鼓勵！\n",
+    "help": "如果這個程式對您有幫助，請給個⭐️！\n<br/>\n這是對我最大的鼓勵！\n",
     "github": "查看 GitHub 頁面",
     "credit": "本程式修改自原版，感謝原作者 jasonwu1994：",
     "disclaimer": "LOL列隊神器 isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.",
@@ -249,6 +249,21 @@
     "fill": "補位",
     "unranked": "未定位",
     "winLoss": "{{wins}}勝 {{losses}}敗"
+  },
+  "recentPlayers": {
+    "refresh": "重新整理",
+    "idleHint": "最近 {{count}} 場對戰中遇過的玩家",
+    "inGameHint": "這場有遇過的玩家排在前面",
+    "busyHint": "選角與遊戲中暫停讀取對戰紀錄，避免影響用戶端連線",
+    "metPlayers": "這場遇過的玩家",
+    "metTimes": "遇過 {{count}} 次",
+    "metInGame": "有 {{count}} 位這場的玩家",
+    "noneMet": "這場沒有最近遇過的玩家",
+    "me": "我",
+    "win": "勝",
+    "lose": "敗",
+    "loadFailed": "讀取對戰紀錄失敗，請確認 LOL 用戶端已開啟",
+    "empty": "沒有對戰紀錄，請確認 LOL 用戶端已開啟"
   },
   "common": {
     "teamOne": "藍方",
