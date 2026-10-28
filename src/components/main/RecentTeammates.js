@@ -40,7 +40,9 @@ function RecentTeammates(props) {
 }
 
 const IntegerStep = ({props}) => {
+  // 場數也給「對戰分析」、「對戰紀錄」用，所以不管聊天室功能有沒有開都能調；清空輸入框時不更新
   const onChange = (newValue) => {
+    if (typeof newValue !== 'number') return;
     props.changeRecentTeammateCheckGameCount(newValue);
   };
   return (
@@ -50,7 +52,6 @@ const IntegerStep = ({props}) => {
           min={1}
           max={20}
           onChange={onChange}
-          disabled={!props.isShowRecentTeammate}
           value={typeof props.recentTeammateCheckGameCount === 'number' ? props.recentTeammateCheckGameCount : 5}
         />
       </Col>
@@ -63,7 +64,6 @@ const IntegerStep = ({props}) => {
           }}
           value={props.recentTeammateCheckGameCount}
           onChange={onChange}
-          disabled={!props.isShowRecentTeammate}
         />
       </Col>
     </Row>

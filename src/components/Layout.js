@@ -27,7 +27,7 @@ const MyLayout = ({children}) => {
   const items = [
     getItem(t('menu.main'), '/main'),
     getItem(t('menu.matchAnalysis'), '/matchAnalysis'),
-    getItem(t('menu.recentPlayers'), '/recentPlayers'),
+    getItem(t('menu.matchHistory'), '/matchHistory'),
     getItem(t('menu.banPick'), '/banPick'),
     getItem(t('menu.runes'), '/runes'),
     getItem(t('menu.aram'), '/aram'),

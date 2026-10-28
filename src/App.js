@@ -4,6 +4,7 @@ import {connect} from "react-redux";
 import {showTeammateRankedType} from "./redux/reducers/ConfigReducer"
 import ApiUtils from "./api/api-utils";
 import RecentTeammatesService from './services/recentTeammatesService'
+import RecentGamesSyncService from './services/recentGamesSyncService'
 import AutoBanService from './services/autoBanService'
 import AutoPickIntentService from './services/autoPickIntentService'
 import UpdateService from './services/updateService'
@@ -286,6 +287,7 @@ const App = (props) => {
 
   return (
     <Layout>
+      <RecentGamesSyncService/>
       <RecentTeammatesService/>
       <AutoBanService/>
       <AutoPickIntentService/>

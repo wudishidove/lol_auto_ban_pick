@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
-import {Alert, Button, Card, Empty, Popconfirm, Segmented, Space, Switch, Tag, Tooltip, Typography} from "antd";
+import {Alert, Button, Card, Empty, Input, Popconfirm, Segmented, Space, Switch, Tag, Tooltip, Typography} from "antd";
 import {
   CheckOutlined, DeleteOutlined, DownOutlined, EditOutlined, LockFilled, PlusOutlined, QuestionCircleOutlined,
-  ThunderboltOutlined, UnlockOutlined, UpOutlined
+  SearchOutlined, ThunderboltOutlined, UnlockOutlined, UpOutlined
 } from '@ant-design/icons';
 import {useTranslation} from 'react-i18next';
 import ApiUtils from "../../api/api-utils";
@@ -10,6 +10,7 @@ import {lanes} from "../../redux/reducers/ConfigReducer";
 import {ANY_ENEMY, findProfile} from "../../services/runeUtils";
 import ChampionImage from "../common/ChampionImage";
 import ChampionSelect from "./ChampionSelect";
+import {filterChampion} from "../banPick/ChampionPrioritySelect";
 import RuneSummary from "./RuneIcons";
 
 const {Text} = Typography;
@@ -23,13 +24,28 @@ function RuneProfiles(props) {
   const [championFilter, setChampionFilter] = useState(null);
   // 預設每組只顯示通用，使用者點開的組才列出全部對位
   const [expandedGroups, setExpandedGroups] = useState(() => new Set());
+  // 展開的組各自的對位搜尋字，收合時清掉
+  const [matchupSearch, setMatchupSearch] = useState({});
 
-  const toggleGroup = (key) => setExpandedGroups(prev => {
-    const next = new Set(prev);
-    if (next.has(key)) next.delete(key);
-    else next.add(key);
-    return next;
-  });
+  const toggleGroup = (key) => {
+    setExpandedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+    setMatchupSearch(({[key]: _, ...rest}) => rest);
+  };
+
+  // 對位英雄可用中文/英文名稱搜尋，通用用「通用」搜尋
+  const championOptionById = new Map(championOptions.map(option => [option.value, option]));
+  const isMatchupMatched = (profile, query) => {
+    if (!query) return true;
+    if (profile.enemyChampionId === ANY_ENEMY) return filterChampion(query, {label: t('runes.anyEnemy')});
+    const option = championOptionById.get(profile.enemyChampionId)
+      ?? {label: ApiUtils.getChampionNameById(profile.enemyChampionId) ?? ''};
+    return filterChampion(query, option);
+  };
 
   // 折疊時要顯示的列: 通用，選角中再加上目前對位與正在套用的那一列
   const isVisibleWhenCollapsed = (profile) => {
@@ -200,7 +216,10 @@ function RuneProfiles(props) {
       {sortedGroups.map(list => {
         const key = `${list[0].championId}:${list[0].lane}`;
         const expanded = expandedGroups.has(key);
-        const visible = expanded ? list : list.filter(isVisibleWhenCollapsed);
+        const query = expanded ? (matchupSearch[key] ?? '').trim() : '';
+        const visible = expanded
+          ? list.filter(profile => isMatchupMatched(profile, query))
+          : list.filter(isVisibleWhenCollapsed);
         const hiddenCount = list.length - list.filter(isVisibleWhenCollapsed).length;
         return (
           <Card key={key} size="small"
@@ -215,7 +234,18 @@ function RuneProfiles(props) {
                   <Button type="link" size="small" icon={<PlusOutlined/>}
                           onClick={() => props.onAddFor(list[0])}>{t('runes.addMatchup')}</Button>
                 }>
+            {expanded &&
+              <div style={{display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4}}>
+                <Input size="small" allowClear prefix={<SearchOutlined/>} style={{width: 180}}
+                       placeholder={t('runes.searchMatchup')} value={matchupSearch[key] ?? ''}
+                       onChange={(event) => setMatchupSearch(prev => ({...prev, [key]: event.target.value}))}/>
+                <Button type="link" size="small" icon={<UpOutlined/>} onClick={() => toggleGroup(key)}>
+                  {t('runes.hideMatchups')}
+                </Button>
+              </div>}
             {visible.map(renderProfileRow)}
+            {expanded && query && visible.length === 0 &&
+              <Text type="secondary">{t('runes.noMatchupFound')}</Text>}
             {hiddenCount > 0 &&
               <Button type="link" size="small" style={{paddingInline: 0}}
                       icon={expanded ? <UpOutlined/> : <DownOutlined/>}

@@ -39,7 +39,7 @@ function LaneChampionLists(props) {
         <Radio.Button value={listMode.GLOBAL}>{t('banPick.mode.global')}</Radio.Button>
         <Radio.Button value={listMode.LANE}>{t('banPick.mode.lane')}</Radio.Button>
       </Radio.Group>
-      <Text type="secondary">{isLaneMode ? t('banPick.mode.laneHint') : t('banPick.mode.globalHint')}</Text>
+      <Text type="secondary">{isLaneMode ? (props.laneHint ?? t('banPick.mode.laneHint')) : t('banPick.mode.globalHint')}</Text>
 
       {renderRow('global',
         isLaneMode ? t('banPick.globalFallback') : t('banPick.global'),

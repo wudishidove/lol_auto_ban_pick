@@ -2,7 +2,7 @@
   "menu": {
     "main": "Home",
     "matchAnalysis": "Match",
-    "recentPlayers": "Recent",
+    "matchHistory": "Match History",
     "banPick": "Ban/Pick",
     "runes": "Runes",
     "aram": "ARAM",
@@ -88,6 +88,7 @@
       "utility": "Support"
     },
     "ban": {
+      "laneHint": "Tries your assigned lane's list first, then the global list when all lane champions are unavailable, the lane list is empty, or no lane is assigned",
       "ignoreTeammateIntent": "Ignore teammates' hovered champions",
       "ignoreTeammateIntentHint": "When checked, bans the champion even if a teammate is hovering it. Otherwise it is skipped and the next one is banned",
       "hoverOnly": "Select only, do not lock in",
@@ -117,6 +118,8 @@
     "addMatchup": "Add matchup",
     "showMatchups": "Show {{count}} more matchups",
     "hideMatchups": "Collapse matchups",
+    "searchMatchup": "Search matchups",
+    "noMatchupFound": "No matching matchups",
     "emptyHint": "No rune profiles yet. Star a recent match, add one manually, or play a few games with auto record on",
     "emptyFiltered": "No profiles match the filter",
     "gotoMatches": "Pick from recent matches",
@@ -248,17 +251,17 @@
     "selectedRole": "Queued Role",
     "fill": "Fill",
     "unranked": "Unranked",
-    "winLoss": "{{wins}}W {{losses}}L"
+    "winLoss": "{{wins}}W {{losses}}L",
+    "met": "Met",
+    "metTimes": "{{count}}x",
+    "metDetailHint": "Above: their champion and KDA from your last encounter, followed by your result. Click to see every match",
+    "teammate": "Ally",
+    "opponent": "Enemy"
   },
-  "recentPlayers": {
+  "matchHistory": {
     "refresh": "Refresh",
-    "idleHint": "Players from your last {{count}} matches",
-    "inGameHint": "Matches with players from this game are listed first",
+    "idleHint": "Your last {{count}} matches",
     "busyHint": "Match history loading is paused during champ select and games to avoid affecting the client",
-    "metPlayers": "Players you met before",
-    "metTimes": "Met {{count}} times",
-    "metInGame": "{{count}} players from this game",
-    "noneMet": "No recently met players in this game",
     "me": "Me",
     "win": "Win",
     "lose": "Lose",

@@ -2,7 +2,7 @@ import {useLocation} from 'react-router-dom';
 import {useState, useEffect} from 'react';
 import Main from './Main';
 import MatchAnalysis from './MatchAnalysis';
-import RecentPlayers from './RecentPlayers';
+import MatchHistory from './MatchHistory';
 import BanPick from "./BanPick";
 import Runes from "./Runes";
 import ARAM from "./ARAM";
@@ -21,7 +21,7 @@ function VisibleSwitch() {
   const routes = [
     {path: '/main', component: Main},
     {path: '/matchAnalysis', component: MatchAnalysis},
-    {path: '/recentPlayers', component: RecentPlayers},
+    {path: '/matchHistory', component: MatchHistory},
     {path: '/banPick', component: BanPick},
     {path: '/runes', component: Runes},
     {path: '/aram', component: ARAM},

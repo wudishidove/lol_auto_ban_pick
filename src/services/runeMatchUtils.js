@@ -11,7 +11,7 @@ function sleep(ms) {
 }
 
 async function fetchGameDetail(gameId) {
-  // 「最近遇過」功能可能已經把這場存進資料庫，有的話就不用再打 API
+  // 「對戰紀錄」可能已經把這場存進資料庫，有的話就不用再打 API
   const stored = await DatabaseUtils.getGame(String(gameId)).catch(() => null);
   if (stored?.data) return stored.data;
   await sleep(DETAIL_REQUEST_INTERVAL_MS);

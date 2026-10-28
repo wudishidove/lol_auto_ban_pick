@@ -50,8 +50,11 @@ const AutoBanService = (props) => {
 
     const actionKey = `${session.gameId}:${action.id}`;
     const lane = getMyLane(session);
-    const championIds = resolveChampionIds(
-      props.autoBanMode, props.autoBanChampionIds, props.autoBanLaneChampionIds, lane);
+    // 路線清單優先，用完後接續全局清單；重複英雄只嘗試一次。
+    const championIds = [...new Set([
+      ...resolveChampionIds(props.autoBanMode, props.autoBanChampionIds, props.autoBanLaneChampionIds, lane),
+      ...(props.autoBanChampionIds ?? []).map(Number),
+    ])];
     let attemptKey = actionKey;
     // 只選取不鎖定時，已經有選取(程式或玩家自己選的)就不覆蓋
     // 例外: 亮的是清單內的英雄，之後隊友預選了它(或已被 ban)，改亮下一順位

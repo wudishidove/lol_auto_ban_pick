@@ -10,7 +10,9 @@ const GameReducer = (prevState = {
   myTeam: [],
   lobbyMembers: [],
   // 選角中的符文狀態，例: {gameId, lane, championId, enemyChampionId, profileId, isManual, error}
-  runeApplyState: {}
+  runeApplyState: {},
+  // 最近幾場對戰(對戰紀錄與對戰分析共用)，games 新的在前
+  recentGames: {games: [], ownerPuuid: '', isLoading: false, hasError: false}
 }, action) => {
   let newState = {...prevState}
   switch (action.type) {
@@ -38,6 +40,9 @@ const GameReducer = (prevState = {
       return newState
     case "change-runeApplyState":
       newState.runeApplyState = action.data
+      return newState
+    case "change-recentGames":
+      newState.recentGames = {...prevState.recentGames, ...action.data}
       return newState
     default:
       return prevState

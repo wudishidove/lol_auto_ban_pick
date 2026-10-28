@@ -2,7 +2,7 @@
   "menu": {
     "main": "主頁",
     "matchAnalysis": "對戰分析",
-    "recentPlayers": "最近遇過",
+    "matchHistory": "對戰紀錄",
     "banPick": "選ban角",
     "runes": "符文",
     "aram": "隨機單中",
@@ -88,6 +88,7 @@
       "utility": "輔助"
     },
     "ban": {
+      "laneHint": "優先依序嘗試目前路線的清單；該路線未設定、清單內英雄都無法禁用，或沒有分路時，接續全局清單",
       "ignoreTeammateIntent": "無視隊友預選角",
       "ignoreTeammateIntentHint": "勾選後，就算隊友預選了該英雄也照樣禁用；未勾選則跳過，改禁下一順位",
       "hoverOnly": "只選取，不送出確認",
@@ -117,6 +118,8 @@
     "addMatchup": "新增對位",
     "showMatchups": "展開其他 {{count}} 個對位",
     "hideMatchups": "收合對位",
+    "searchMatchup": "搜尋對位英雄",
+    "noMatchupFound": "沒有符合的對位",
     "emptyHint": "還沒有符文設定檔。可以從近期對戰按星號存檔、手動新增，或開著自動記錄打幾場",
     "emptyFiltered": "沒有符合篩選條件的設定檔",
     "gotoMatches": "從近期對戰挑選",
@@ -248,17 +251,17 @@
     "selectedRole": "列隊規則",
     "fill": "補位",
     "unranked": "未定位",
-    "winLoss": "{{wins}}勝 {{losses}}敗"
+    "winLoss": "{{wins}}勝 {{losses}}敗",
+    "met": "遇過",
+    "metTimes": "{{count}} 次",
+    "metDetailHint": "上方是上一次遇到時他用的英雄、KDA 與你的勝敗。點一下看每一場的詳情",
+    "teammate": "隊友",
+    "opponent": "對手"
   },
-  "recentPlayers": {
+  "matchHistory": {
     "refresh": "重新整理",
-    "idleHint": "最近 {{count}} 場對戰中遇過的玩家",
-    "inGameHint": "這場有遇過的玩家排在前面",
+    "idleHint": "最近 {{count}} 場對戰",
     "busyHint": "選角與遊戲中暫停讀取對戰紀錄，避免影響用戶端連線",
-    "metPlayers": "這場遇過的玩家",
-    "metTimes": "遇過 {{count}} 次",
-    "metInGame": "有 {{count}} 位這場的玩家",
-    "noneMet": "這場沒有最近遇過的玩家",
     "me": "我",
     "win": "勝",
     "lose": "敗",

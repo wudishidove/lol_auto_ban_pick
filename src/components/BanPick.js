@@ -48,6 +48,7 @@ function BanPick(props) {
       {renderCheckbox(t('banPick.ban.hoverOnly'), t('banPick.ban.hoverOnlyHint'),
         config.isAutoBanHoverOnly, 'isAutoBanHoverOnly', !config.isAutoBan)}
       <LaneChampionLists mode={config.autoBanMode}
+                         laneHint={t('banPick.ban.laneHint')}
                          globalChampionIds={config.autoBanChampionIds}
                          laneChampionIds={config.autoBanLaneChampionIds}
                          championOptions={championOptions}
